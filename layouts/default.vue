@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <v-app>
-      <v-toolbar app light>
-        <v-toolbar-title>Admin darts</v-toolbar-title>
+<!--       <v-toolbar app light>
+        <v-toolbar-title>Admin</v-toolbar-title>
         <v-spacer />
         <v-btn icon nuxt href="/"><v-icon>home</v-icon></v-btn>
-      </v-toolbar>
+      </v-toolbar> -->
       <v-content>
         <v-container fluid>
           <nuxt/>
