@@ -24,12 +24,12 @@
         Retour
      </nuxt-link> 
      <v-divider outset></v-divider>
-     <v-container grid-list-md text-xs-center>
+     <v-container grid-list-md >
       <v-stepper v-model="e1">
         <v-stepper-header>
-          <v-stepper-step step="1" :complete="e1 > 1">Composition des équipes</v-stepper-step>
+          <v-stepper-step step="1" :complete="e1 > 1" editable>Composition des équipes</v-stepper-step>
           <v-divider></v-divider>
-          <v-stepper-step step="2" :complete="e1 > 2">Matchs</v-stepper-step>
+          <v-stepper-step step="2" :complete="e1 > 2" editable>Matchs</v-stepper-step>
           <v-divider></v-divider>
           <v-stepper-step step="3">Signature des capitaines</v-stepper-step>
         </v-stepper-header>
@@ -41,7 +41,7 @@
                 <h2>{{match.team_home.name}}</h2>
                 <v-list subheader>
                   <v-subheader inset>simples</v-subheader>
-                  <v-list-tile v-for="(player_h, index) in match.team_home.player.slice(0, 4)" :key="player_h.id"  >
+                  <v-list-tile v-for="(player_h, index) in match.team_home.player.slice(0, 4)" :key="player_h.id+ '-th-player'"  >
                     <v-list-tile-content>
                       <div>
                         <v-chip close outline>
@@ -57,7 +57,7 @@
                 </v-list>
                 <v-list subheader>
                   <v-subheader inset>doubles</v-subheader>
-                  <v-list-tile v-for="(double_h, index) in match.team_home.double.slice(0, 2)" :key="double_h.id"  >
+                  <v-list-tile v-for="(double_h, index) in match.team_home.double.slice(0, 2)" :key="double_h.id+ '-thd-player'"  >
                     <v-list-tile-content>
                       <div>
                         <v-chip close closable outline>
@@ -74,7 +74,7 @@
                 <h2>{{match.team_opponent.name}}</h2>
                 <v-list  subheader>
                   <v-subheader inset>simples</v-subheader>
-                  <v-list-tile v-for="(player_o, index) in match.team_opponent.player.slice(0, 4)" :key="player_o.id"  >
+                  <v-list-tile v-for="(player_o, index) in match.team_opponent.player.slice(0, 4)" :key="player_o.id+ '-top-player'"  >
                     <v-list-tile-content>
                       <div>
                         <v-chip close closable outline>
@@ -90,7 +90,7 @@
                 </v-list>
                 <v-list subheader>
                   <v-subheader inset>doubles</v-subheader>
-                  <v-list-tile v-for="(double_o, index) in match.team_opponent.double.slice(0,2)" :key="double_o.id"  >
+                  <v-list-tile v-for="(double_o, index) in match.team_opponent.double.slice(0,2)" :key="double_o.id+ '-tod-player'"  >
                     <v-list-tile-content>
                       <div>
                         <v-chip close closable outline>
@@ -112,84 +112,80 @@
               <v-flex xs12 md9>
                 <v-layout row wrap>
                   <!-- SINGLES -->
-                  <v-flex xs6 md3 v-for="game in match.gamesingle" :key="game.id"> 
-                    <v-card tile>
-                      <v-card-title>
-                        <v-toolbar dense flat>
-                          <v-toolbar-title>{{game.name}} <small>{{game.id}}</small></v-toolbar-title>
-                        </v-toolbar>
-                      </v-card-title>
-                      <div>
-                        <v-tooltip right>
-                          <span slot="activator" v-bind:class="{ start: game.player_start_letter === game.player_home_letter }">{{game.player_home_letter}}</span>
-                          <span>{{game.player_home.first_name}} {{game.player_home.last_name}}</span>
-                        </v-tooltip> 
-                         {{ calculScorej1(game) }} 
-                      </div>
-                      <v-layout row wrap>
-                        <v-flex xs4>
-                          <v-checkbox  v-model="game.leg1ph" v-bind:true-value="1" v-bind:false-value="0" :disabled="game.leg1po == 1 || game.played" ></v-checkbox> 
-                          <v-checkbox :disabled="game.leg1ph == 1 || game.played"  v-model="game.leg1po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox> 
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-checkbox :disabled="game.leg2po == 1 || game.played"   v-model="game.leg2ph" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                          <v-checkbox :disabled="game.leg2ph == 1 || game.played"  v-model="game.leg2po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-checkbox :disabled="game.leg3po == 1 || game.played"  v-model="game.leg3ph" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                          <v-checkbox  :disabled="game.leg3ph == 1 || game.played"  v-model="game.leg3po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                        </v-flex>
-                      </v-layout>
-                      <div>
-                        <v-tooltip right>
-                          <span slot="activator" v-bind:class="{ start: game.player_start_letter === game.player_opponent_letter }">{{game.player_opponent_letter}}</span>
-                          <span>{{game.player_opponent.first_name}} {{game.player_opponent.last_name}}</span>
-                        </v-tooltip> 
-                        {{ calculScorej2(game) }} 
-                      </div>
-                      <div>
-                        <v-switch @change="saveGameSingle(game)" color="gray" :label="`Match terminé ${game.played==true ? '!' : '?'}`" v-model="game.played"></v-switch>
+                  <v-flex xs6 md3 v-for="game in match.gamesingle" :key="game.id+ '-gs'"> 
+                    <v-card tile> 
+                      <v-toolbar dense flat>
+                        <v-toolbar-title>{{game.name}} </v-toolbar-title>
+                      </v-toolbar>
+                      <div class="pl-2 pr-1 py-2"> 
+                        <div class="mb-4">
+                          <span v-bind:class="{ start: game.player_start_letter === game.player_home_letter }">{{game.player_home_letter}}) </span>
+                          <span class="caption">{{game.player_home.first_name}} {{game.player_home.last_name}}</span>
+                        </div>
+                        <v-layout row wrap class="ma-0 pa-0">
+                          <v-flex xs3 class="ma-0 pa-0">
+                            <v-checkbox  v-model="game.leg1ph" v-bind:true-value="1" v-bind:false-value="0" :disabled="game.leg1po == 1 || game.played" ></v-checkbox> 
+                            <v-checkbox :disabled="game.leg1ph == 1 || game.played"  v-model="game.leg1po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox> 
+                          </v-flex>
+                          <v-flex xs3 class="ma-0 pa-0">
+                            <v-checkbox :disabled="game.leg2po == 1 || game.played"   v-model="game.leg2ph" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                            <v-checkbox :disabled="game.leg2ph == 1 || game.played"  v-model="game.leg2po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                          </v-flex>
+                          <v-flex xs3 class="ma-0 pa-0">
+                            <v-checkbox :disabled="game.leg3po == 1 || game.played"  v-model="game.leg3ph" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                            <v-checkbox  :disabled="game.leg3ph == 1 || game.played"  v-model="game.leg3po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                          </v-flex>
+                          <v-flex xs3 class="ma-0 pa-0">
+                            <div class="headline"> {{ calculScorej1(game) }} </div> 
+                            <div class="headline mt-4"> {{ calculScorej2(game) }} </div>
+                          </v-flex>
+                        </v-layout>
+                        <div class="ma-0 pa-0">
+                          <span v-bind:class="{ start: game.player_start_letter === game.player_opponent_letter }">{{game.player_opponent_letter}} ) </span>
+                          <span class="caption text-xs-left">{{game.player_opponent.first_name}} {{game.player_opponent.last_name}}</span> 
+                        </div>
+                        <div class="mt-4">
+                          <v-switch @change="saveGameSingle(game)" color="gray" :label="`Match terminé ${game.played==true ? '!' : '?'}`" v-model="game.played"></v-switch>
+                        </div>
                       </div>
                     </v-card>
                   </v-flex>
                   <!-- DOUBLES -->
-                  <v-flex xs6 md3 v-for="double in match.gamedouble" :key="double.id"> 
+                  <v-flex xs6 md3 v-for="double in match.gamedouble" :key="double.id+ '-gd'"> 
                     <v-card tile>
-                      <v-card-title>
-                        <v-toolbar dense flat card>
-                          <v-toolbar-title>{{double.name}} <small>{{double.id}}</small></v-toolbar-title>
-                        </v-toolbar>
-                      </v-card-title>
-                      <div>
-                        <v-tooltip right>
-                          <span slot="activator" v-bind:class="{ start: double.double_start_letter === double.double_home_letter }">{{double.double_home_letter}}</span>
-                          <span>{{double.double_home.first_player.first_name}} {{double.double_home.first_player.last_name}} et {{double.double_home.second_player.first_name}} {{double.double_home.second_player.last_name}}</span>
-                        </v-tooltip> 
-                         {{ calculScoreDoublej1(double) }} 
-                      </div>
-                      <v-layout row wrap>
-                        <v-flex xs4>
-                          <v-checkbox  v-model="double.leg1dh" v-bind:true-value="1" v-bind:false-value="0" :disabled="double.leg1do == 1 || double.played" ></v-checkbox> 
-                          <v-checkbox :disabled="double.leg1dh == 1 || double.played"  v-model="double.leg1do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox> 
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-checkbox :disabled="double.leg2do == 1 || double.played"   v-model="double.leg2dh" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                          <v-checkbox :disabled="double.leg2dh == 1 || double.played"  v-model="double.leg2do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                        </v-flex>
-                        <v-flex xs4>
-                          <v-checkbox :disabled="double.leg3do == 1 || double.played"  v-model="double.leg3dh" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                          <v-checkbox  :disabled="double.leg3dh == 1 || double.played"  v-model="double.leg3do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
-                        </v-flex>
-                      </v-layout>
-                      <div>
-                        <v-tooltip right>
-                          <span slot="activator" v-bind:class="{ start: double.double_start_letter === double.double_opponent_letter }">{{double.double_opponent_letter}}</span>
-                          <span>{{double.double_opponent.first_player.first_name}} {{double.double_opponent.first_player.last_name}} et {{double.double_opponent.second_player.first_name}} {{double.double_opponent.second_player.last_name}}</span>
-                        </v-tooltip> 
-                        {{ calculScoreDoublej2(double) }} 
-                      </div>
-                      <div>
-                        <v-switch @change="saveGameDouble(double)"  color="gray" :label="`Match terminé ${double.played==true ? '!' : '?'}`" v-model="double.played"></v-switch>
+                      <v-toolbar dense flat card>
+                        <v-toolbar-title>{{double.name}} </v-toolbar-title>
+                      </v-toolbar>
+                      <div class="pl-2 pr-1 py-2">
+                        <div class="mb-4"> 
+                          <span v-bind:class="{ start: double.double_start_letter === double.double_home_letter }">{{double.double_home_letter}}) </span>
+                          <span class="caption">{{double.double_home.first_player.first_name}} {{double.double_home.first_player.last_name}} et {{double.double_home.second_player.first_name}} {{double.double_home.second_player.last_name}}</span> 
+                        </div>
+                        <v-layout row wrap>
+                          <v-flex xs3>
+                            <v-checkbox  v-model="double.leg1dh" v-bind:true-value="1" v-bind:false-value="0" :disabled="double.leg1do == 1 || double.played" ></v-checkbox> 
+                            <v-checkbox :disabled="double.leg1dh == 1 || double.played"  v-model="double.leg1do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox> 
+                          </v-flex>
+                          <v-flex xs3>
+                            <v-checkbox :disabled="double.leg2do == 1 || double.played"   v-model="double.leg2dh" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                            <v-checkbox :disabled="double.leg2dh == 1 || double.played"  v-model="double.leg2do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                          </v-flex>
+                          <v-flex xs3>
+                            <v-checkbox :disabled="double.leg3do == 1 || double.played"  v-model="double.leg3dh" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                            <v-checkbox  :disabled="double.leg3dh == 1 || double.played"  v-model="double.leg3do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
+                          </v-flex>
+                          <v-flex xs3 class="ma-0 pa-0">
+                            <div class="headline mt-1"> {{ calculScoreDoublej1(double) }} </div> 
+                            <div class="headline mt-4"> {{ calculScoreDoublej2(double) }} </div>
+                          </v-flex>
+                        </v-layout>
+                        <div class="ma-0 pa-0">
+                          <span v-bind:class="{ start: double.double_start_letter === double.double_opponent_letter }">{{double.double_opponent_letter}}) </span>
+                          <span class="caption">{{double.double_opponent.first_player.first_name}} {{double.double_opponent.first_player.last_name}} et {{double.double_opponent.second_player.first_name}} {{double.double_opponent.second_player.last_name}}</span> 
+                        </div>
+                        <div class="mt-4">
+                          <v-switch @change="saveGameDouble(double)"  color="gray" :label="`Match terminé ${double.played==true ? '!' : '?'}`" v-model="double.played"></v-switch>
+                        </div>
                       </div>
                     </v-card>
                   </v-flex>
@@ -205,15 +201,15 @@
                     </tr>
                   </thead> 
                   <tbody>
-                    <tr v-for="match in match.gamesingle" :key="match.id">
+                    <tr v-for="match in match.gamesingle" :key="match.id+ '-matchsingle'">
                      <td>{{ match.pts1 }}</td>
                      <td><small>{{ match.name }}</small></td>
                      <td>{{ match.pts2 }}</td>
                    </tr>
-                   <tr v-for="match in match.gamedouble" :key="match.id">
-                     <td>{{ match.pts1 }}</td>
-                     <td><small>{{ match.name }}</small></td>
-                     <td>{{ match.pts2 }}</td>
+                   <tr v-for="d in match.gamedouble" :key="d.id+ '-matchdouble'">
+                     <td>{{ d.pts1 }}</td>
+                     <td><small>{{ d.name }}</small></td>
+                     <td>{{ d.pts2 }}</td>
                    </tr>
                   </tbody>
                 </table>
