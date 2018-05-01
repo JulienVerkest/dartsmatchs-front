@@ -41,7 +41,40 @@
                 <h2>{{match.team_home.name}}</h2>
                 <v-list subheader>
                   <v-subheader inset>simples</v-subheader>
-                  <v-list-tile v-for="(player_h, index) in match.team_home.player.slice(0, 4)" :key="player_h.id+ '-th-player'"  >
+                  <!-- <v-select label="A" :items="players" :filter="customFilter" item-text="fullname" v-model="match.team_home.player[0]" chips max-height="auto" autocomplete> 
+                    <template slot="selection" slot-scope="data">
+                      <v-chip @input="data.parent.selectItem(data.item)" :selected="data.selected" :disabled="data.disabled" :key="JSON.stringify(data.item)"> {{ data.item.fullname }} </v-chip>
+                    </template>
+                  </v-select>
+                  <v-select label="B" :items="players" :filter="customFilter" item-text="fullname" v-model="match.team_home.player[1]" chips max-height="auto" autocomplete> 
+                    <template slot="selection" slot-scope="data">
+                      <v-chip @input="data.parent.selectItem(data.item)" :selected="data.selected" :disabled="data.disabled" :key="JSON.stringify(data.item)"> {{ data.item.fullname }} </v-chip>
+                    </template>
+                  </v-select>
+                  <v-select label="C" :items="players" :filter="customFilter" item-text="fullname" v-model="match.team_home.player[2]" chips max-height="auto" autocomplete> 
+                    <template slot="selection" slot-scope="data">
+                      <v-chip @input="data.parent.selectItem(data.item)" :selected="data.selected" :disabled="data.disabled" :key="JSON.stringify(data.item)"> {{ data.item.fullname }} </v-chip>
+                    </template>
+                  </v-select>
+                  <v-select label="D" :items="players" :filter="customFilter" item-text="fullname" v-model="match.team_home.player[3]" chips max-height="auto" autocomplete> 
+                    <template slot="selection" slot-scope="data">
+                      <v-chip @input="data.parent.selectItem(data.item)" :selected="data.selected" :disabled="data.disabled" :key="JSON.stringify(data.item)"> {{ data.item.fullname }} </v-chip>
+                    </template>
+                  </v-select> -->
+                  <draggable v-model="match.team_home.player" @start="drag=true" @end="composeTeamSingle">
+                    <transition-group>
+                      <div v-for="(ph, index) in match.team_home.player" :key="ph.id">
+                        <v-chip close outline>
+                          <v-avatar v-if="index==0">A</v-avatar>
+                          <v-avatar v-if="index==1">B</v-avatar>
+                          <v-avatar v-if="index==2">C</v-avatar>
+                          <v-avatar v-if="index==3">D</v-avatar>
+                          <v-avatar class="gray darken-4" v-if="false"><v-icon>check_circle</v-icon></v-avatar>{{ ph.first_name }} {{ ph.last_name }}   
+                        </v-chip>
+                      </div> 
+                    </transition-group>
+                  </draggable>
+                  <v-list-tile v-for="(player_h, index) in match.team_home.player.slice(0, 4)" :key="player_h.id+ '-th-player'" v-if="false" >
                     <v-list-tile-content>
                       <div>
                         <v-chip close outline>
@@ -74,7 +107,20 @@
                 <h2>{{match.team_opponent.name}}</h2>
                 <v-list  subheader>
                   <v-subheader inset>simples</v-subheader>
-                  <v-list-tile v-for="(player_o, index) in match.team_opponent.player.slice(0, 4)" :key="player_o.id+ '-top-player'"  >
+                  <draggable v-model="match.team_opponent.player" @start="drag=true" @end="composeTeamSingle">
+                    <transition-group>
+                      <div v-for="(po, index) in match.team_opponent.player" :key="po.id">
+                        <v-chip close outline>
+                          <v-avatar v-if="index==0">E</v-avatar>
+                          <v-avatar v-if="index==1">F</v-avatar>
+                          <v-avatar v-if="index==2">G</v-avatar>
+                          <v-avatar v-if="index==3">H</v-avatar>
+                          <v-avatar class="gray darken-4" v-if="false"><v-icon>check_circle</v-icon></v-avatar>{{ po.first_name }} {{ po.last_name }}   
+                        </v-chip>
+                      </div> 
+                    </transition-group>
+                  </draggable>
+                  <v-list-tile v-for="(player_o, index) in match.team_opponent.player.slice(0, 4)" :key="player_o.id+ '-top-player'" v-if="false"  >
                     <v-list-tile-content>
                       <div>
                         <v-chip close closable outline>
@@ -258,6 +304,10 @@
           </v-stepper-content>
         </v-stepper-items>
         </v-stepper>
+        <v-layout row wrap>
+          <v-flex xs6><pre><code>{{match}}</code></pre></v-flex>
+          <v-flex xs6><pre><code>{{match}}</code></pre></v-flex>
+        </v-layout>
       </v-container>
     </v-flex>
   </v-layout>
@@ -265,8 +315,13 @@
 
 <script>
 //import axios from 'axios'
+import _ from 'lodash'
+import draggable from 'vuedraggable'
 
 export default {
+  components: {
+    draggable
+  },
   validate ({ params }) {
     // Doit être un nombre
     return /^\d+$/.test(params.id)
@@ -281,14 +336,32 @@ export default {
         timeout: 2000,
         text: 'Score du match enregistré'
       },
-      e1: 0
-    }
+      e1: 0,
+      customFilter (item, queryText, itemText) {
+        const hasValue = val => val != null ? val : '';
+        const text = hasValue(item.first_name + item.last_name);
+        const query = hasValue(queryText)
+        return text.toString()
+          .toLowerCase()
+          .indexOf(query.toString().toLowerCase()) > -1;
+      }
+    };
   },
   async asyncData({ app, params }) {
     // We can use async/await ES6 feature
+    function addFullName(data) {
+        data.team_home.player = _.each(data.team_home.player,function(player){
+          player['fullname'] = player.first_name + ' ' + player.last_name;
+        });
+        data.team_opponent.player = _.each(data.team_opponent.player,function(player){
+          player['fullname'] = player.first_name + ' ' + player.last_name;
+        });
+      return data
+    }
     let { data } = await app.$axios.get(`/matches/${params.id}`)
+    data = addFullName(data)
     return { 
-      match: data 
+      match: data
     }
   },
   head() {
@@ -297,6 +370,59 @@ export default {
     }
   },
   methods: {
+    async composeTeamSingle (){
+      // console.log(this.match.team_home.player)
+      let match = this.match
+      let that = this
+      _.each(this.match.gamesingle, function(game){
+        let home = ['A', 'B', 'C', 'D'];
+        _.each(home, function(letter, index){
+          if(game.player_home_letter == letter) { 
+            game.player_home_id = match.team_home.player[index].id;
+            game.player_home = match.team_home.player[index];
+            if(game.player_start_letter == letter) { 
+              game.player_start_id = match.team_home.player[index].id;
+              game.player_start = match.team_home.player[index];
+            }
+            that.$axios.put('/gamesingles/'+game.id, { 
+              player_home_id: game.player_home_id,
+              player_home: game.player_home,
+              player_start_id: game.player_start_id,
+              player_start: game.player_start
+            })
+            .then(response => {
+              that.played_message.text = ` ${game.name} enregistré `
+              that.played_message.snackbar = true
+            })
+            .catch(e => {
+              that.errors.push(e)
+            })
+          }
+        });
+        let opponent = ['E','F','G','H'];
+        _.each(opponent, function(letter, index){
+          if(game.player_opponent_letter == letter) { 
+            game.player_opponent_id = match.team_opponent.player[index].id;
+            game.player_opponent = match.team_opponent.player[index];
+            if(game.player_start_letter == letter) { 
+              game.player_start_id = match.team_opponent.player[index].id;
+              game.player_start = match.team_opponent.player[index];
+            }
+          }
+        });
+      });
+    },
+    // async loadPlayers(game) {
+    //   this.$axios.get('/gamesingles/'+game.id, {
+
+    //   })
+    //   .then(response => {
+         
+    //   })
+    //   .catch(e => {
+    //     this.errors.push(e)
+    //   })
+    // },
     calculScorej1: function (game) {
       game.scorej1 = game.leg1ph + game.leg2ph + game.leg3ph
       if (game.scorej1 > 1) {
