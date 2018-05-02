@@ -38,11 +38,12 @@
    <!-- PLAYERS -->
             <v-layout row wrap>
               <v-flex xs12 md6>
+   <!-- TEAM A -->
                 <h2>{{match.team_home.name}}</h2>
                 <v-list>
                   <v-icon>assignment</v-icon> Composer l'équipe
                   <v-layout row wrap>
-                    <v-flex xs-6>
+                    <v-flex xs-12 v-if="editTeamASingle">
                       <draggable v-model="match.team_home.player" @start="drag=true" @end="drag=false">
                         <transition-group name="list-complete">
                           <div v-for="(ph, index) in match.team_home.player" :key="ph.id" class="list-complete-item">
@@ -56,19 +57,19 @@
                           </div> 
                         </transition-group>
                       </draggable>
-                      <v-btn small color="primary" @click.native="composeTeamSingle()">Enregistrer </v-btn>
+                      <v-btn color="primary" small @click.native="editTeamASingle=false;composeTeamSingle('A')">Enregistrer</v-btn>
                     </v-flex>
-                    <v-flex xs-6 >
-                      Composition actuelle
+                    <v-flex xs-12 v-if="!editTeamASingle">
                       <div v-for="(gs, index) in match.gamesingle.slice(0,4)" :key="gs.id+'-gss'">
                         <v-chip outline>
                           <v-avatar v-if="index==0">A</v-avatar>
                           <v-avatar v-if="index==1">B</v-avatar>
                           <v-avatar v-if="index==2">C</v-avatar>
                           <v-avatar v-if="index==3">D</v-avatar>
-                          {{ gs.player_home.first_name }} {{ gs.player_home.last_name }} <v-avatar class="gray darken-4 ml-2"  ><v-icon>check_circle</v-icon></v-avatar>
+                          {{ gs.player_home.first_name }} {{ gs.player_home.last_name }}  
                         </v-chip>
                       </div>
+                      <v-btn color="primary" small @click.native="editTeamASingle=true">Modifier</v-btn>
                     </v-flex>
                   </v-layout>
                 </v-list>
@@ -88,11 +89,24 @@
                 </v-list>
               </v-flex>
               <v-flex xs12 md6>
+  <!-- TEAM E -->
                 <h2>{{match.team_opponent.name}}</h2>
                 <v-list>
                   <v-icon>assignment</v-icon> Composer l'équipe
                   <v-layout row wrap>
-                    <v-flex xs-6>
+                    <v-flex xs-12 v-if="!editTeamESingle">
+                      <div v-for="(gs, index) in match.gamesingle.slice(4,8)" :key="gs.id+'-gss'">
+                        <v-chip outline>
+                          <v-avatar v-if="index==0">E</v-avatar>
+                          <v-avatar v-if="index==1">F</v-avatar>
+                          <v-avatar v-if="index==2">G</v-avatar>
+                          <v-avatar v-if="index==3">H</v-avatar>
+                          {{ gs.player_opponent.first_name }} {{ gs.player_opponent.last_name }} <v-avatar class="gray darken-4 ml-2"  ><v-icon>check_circle</v-icon></v-avatar>
+                        </v-chip>
+                      </div>
+                      <v-btn color="primary" small @click.native="editTeamESingle=true">Modifier</v-btn>
+                    </v-flex>
+                    <v-flex xs-12 v-if="editTeamESingle">
                       <draggable v-model="match.team_opponent.player" @start="drag=true" @end="drag=false">
                         <transition-group name="list-complete">
                           <div v-for="(po, index) in match.team_opponent.player" :key="po.id" class="list-complete-item">
@@ -106,20 +120,9 @@
                           </div> 
                         </transition-group>
                       </draggable>
-                      <v-btn small color="primary" @click.native="composeTeamSingle()">Enregistrer </v-btn>
+                      <v-btn color="primary" small @click.native="editTeamESingle=false;composeTeamSingle('E')">Enregistrer</v-btn>
                     </v-flex>
-                    <v-flex xs-6 >
-                      Composition actuelle
-                      <div v-for="(gs, index) in match.gamesingle.slice(4,8)" :key="gs.id+'-gss'">
-                        <v-chip outline>
-                          <v-avatar v-if="index==0">E</v-avatar>
-                          <v-avatar v-if="index==1">F</v-avatar>
-                          <v-avatar v-if="index==2">G</v-avatar>
-                          <v-avatar v-if="index==3">H</v-avatar>
-                          {{ gs.player_opponent.first_name }} {{ gs.player_opponent.last_name }} <v-avatar class="gray darken-4 ml-2"  ><v-icon>check_circle</v-icon></v-avatar>
-                        </v-chip>
-                      </div>
-                    </v-flex>
+                    
                   </v-layout>
                 </v-list>
                 <v-list subheader>
@@ -137,8 +140,9 @@
                   </v-list-tile>
                 </v-list>
               </v-flex>
-            </v-layout>          
-            <v-btn color="primary" @click.native="e1 = 2">Jouer les matchs <v-icon>chevron_right</v-icon></v-btn>
+            </v-layout>    
+            <v-btn small color="primary" @click.native="composeTeamSingle()">Enregistrer </v-btn>      
+            <v-btn small color="primary" @click.native="e1 = 2">Enregistrer et passer à l'étape suivante   <v-icon>chevron_right</v-icon></v-btn>
           </v-stepper-content>
           <v-stepper-content step="2">
   <!-- MATCHS -->
@@ -317,6 +321,10 @@ export default {
   data () {
     return {
       signature: [],
+      editTeamASingle: false,
+      editTeamESingle: false,
+      editTeamADouble: false,
+      editTeamEDouble: false,
       played_message: {
         snackbar: false,
         color: '',
@@ -358,45 +366,49 @@ export default {
     }
   },
   methods: {
-    async composeTeamSingle (){
+    async composeTeamSingle (team='A'){
       // console.log(this.match.team_home.player)
       let match = this.match
       let that = this
       const upds = []
       _.each(this.match.gamesingle, function(game){
-        let home = ['A', 'B', 'C', 'D'];
-        _.each(home, function(letter, index){
-          if(game.player_home_letter == letter) { 
-            game.player_home_id = match.team_home.player[index].id;
-            game.player_home = match.team_home.player[index];
-            if(game.player_start_letter == letter) { 
-              game.player_start_id = match.team_home.player[index].id;
-              game.player_start = match.team_home.player[index];
+        if(team==='A') {
+          let home = ['A', 'B', 'C', 'D'];
+          _.each(home, function(letter, index){
+            if(game.player_home_letter == letter) { 
+              game.player_home_id = match.team_home.player[index].id;
+              game.player_home = match.team_home.player[index];
+              if(game.player_start_letter == letter) { 
+                game.player_start_id = match.team_home.player[index].id;
+                game.player_start = match.team_home.player[index];
+              }
+              let upd = that.$axios.put('/gamesingles/'+game.id, {
+                player_home_id: game.player_home.id,
+                player_start_id: game.player_start.id
+              })
+              upds.push(upd)
             }
-            let upd = that.$axios.put('/gamesingles/'+game.id, {
-              player_home_id: game.player_home.id,
-              player_start_id: game.player_start.id
-            })
-            upds.push(upd)
-          }
-        });
+          });
+        }
 
-        let opponent = ['E','F','G','H'];
-        _.each(opponent, function(letter, index){
-          if(game.player_opponent_letter == letter) { 
-            game.player_opponent_id = match.team_opponent.player[index].id;
-            game.player_opponent = match.team_opponent.player[index];
-            if(game.player_start_letter == letter) { 
-              game.player_start_id = match.team_opponent.player[index].id;
-              game.player_start = match.team_opponent.player[index];
+        if(team==='E') {
+          let opponent = ['E','F','G','H'];
+          _.each(opponent, function(letter, index){
+            if(game.player_opponent_letter == letter) { 
+              game.player_opponent_id = match.team_opponent.player[index].id;
+              game.player_opponent = match.team_opponent.player[index];
+              if(game.player_start_letter == letter) { 
+                game.player_start_id = match.team_opponent.player[index].id;
+                game.player_start = match.team_opponent.player[index];
+              }
+              let upd = that.$axios.put('/gamesingles/'+game.id, {
+                player_opponent_id: game.player_opponent.id,
+                player_start_id: game.player_start.id
+              })
+              upds.push(upd)
             }
-            let upd = that.$axios.put('/gamesingles/'+game.id, {
-              player_opponent_id: game.player_opponent.id,
-              player_start_id: game.player_start.id
-            })
-            upds.push(upd)
-          }
-        });
+          });
+        }
       });
       Promise.all(upds).then(values => { 
         console.log(values);
