@@ -1,7 +1,8 @@
 <template>
   <v-layout>
-    <v-flex xs12 sm6 offset-sm3>
-      <v-list two-line>
+    <v-flex xs12>
+      <Mynavigation></Mynavigation>
+      <v-list two-line class="mt-5">
         <v-list-tile v-for="team in teams" :key="team.id" ripple>
           <v-list-tile-content>
             <v-list-tile-title><nuxt-link :to="{name:'equipes-edit-id', params: {id:team.id}}">{{team.name}} {{team.id}} </nuxt-link> </v-list-tile-title>
@@ -14,7 +15,11 @@
 </template>
 
 <script>
+import Mynavigation from '../../components/Navigation'
 export default {
+  components: {
+    Mynavigation
+  },
   data () {
     return {
       teams: []

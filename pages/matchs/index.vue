@@ -1,12 +1,16 @@
 <template>
   <v-layout>
-    <v-flex xs12 sm6 offset-sm3>
-      <v-container fluid grid-list-sm>
+    <v-flex xs12 >
+      <Mynavigation></Mynavigation>
+      <v-container class="mt-5" fluid grid-list-md>
         <v-layout row wrap>
           <v-flex xs4 v-for="match in matches" :key="match.id" >
             <v-card flat tile>
-              <v-card-text>
-                <nuxt-link :to="{name:'matchs-id', params: {id:match.id}}">{{match.team_home.name}} vs {{match.team_opponent.name}} </nuxt-link> 
+              <v-card-text v-if="match.score_home == 0 && match.score_opponent == 0">
+                <nuxt-link :to="{name:'matchs-id', params: {id:match.id}}">{{match.team_home.name}} vs {{match.team_opponent.name}}  </nuxt-link> 
+              </v-card-text>
+              <v-card-text v-if="match.score_home != 0 && match.score_opponent != 0">
+                {{match.team_home.name}} {{match.score_home}} vs {{match.team_opponent.name}} {{match.score_opponent}}
               </v-card-text>
               <v-card-text>
                 Jounée {{match.day}}
@@ -20,7 +24,11 @@
 </template>
 
 <script>
+import Mynavigation from '../../components/Navigation'
 export default {
+  components: {
+    Mynavigation
+  },
   data () {
     return {
       matches: []
