@@ -104,6 +104,7 @@
                           {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}} remplace le joueur 
                           {{match.substitute_home_replace}} après le match n°
                           {{match.substitute_home_after}}
+                           <v-btn color="grey lighten-4" small @click.native="match.substitute_home_player=null;match.substitute_home_replace='';match.substitute_home_after='';substitute(match)"><v-icon small class="mr-2" >undo</v-icon> Annuler le remplacement </v-btn>
                         </v-subheader>
                         <div>
                           <v-btn color="grey lighten-4" small @click.native="editTeamARemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
@@ -216,10 +217,11 @@
            <!-- TEAM E REMPLACANT -->
                   <v-list class="mt-2" >
                      <v-layout row wrap v-if="!editTeamERemplacant">
-                        <v-subheader>
+                        <v-subheader v-if="match.substitute_opponent_player">
                           {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace le joueur 
                           {{match.substitute_opponent_replace}} après le match n°
                           {{match.substitute_opponent_after}}
+                          <v-btn color="grey lighten-4" small @click.native="match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';substitute(match)"><v-icon small class="mr-2" >undo</v-icon> Annuler le remplacement </v-btn>
                         </v-subheader>
                         <div>
                           <v-btn color="grey lighten-4" small @click.native="editTeamERemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
@@ -791,13 +793,12 @@ export default {
       }
     },
     async substitute(match) {
-      console.log(match.substitute_opponent_player)
       let that = this
       this.$axios.put(`/matches/${match.id}`, {
-        substitute_home_player_id: match.substitute_home_player.id,
+        substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
         substitute_home_replace: match.substitute_home_replace,
         substitute_home_after: match.substitute_home_after,
-        substitute_opponent_player_id: match.substitute_opponent_player.id,
+        substitute_opponent_player_id: match.substitute_opponent_player ? match.substitute_opponent_player.id : null,
         substitute_opponent_replace: match.substitute_opponent_replace,
         substitute_opponent_after: match.substitute_opponent_after
       })
