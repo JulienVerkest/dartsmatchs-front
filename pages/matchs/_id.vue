@@ -50,7 +50,7 @@
                           </transition-group>
                         </draggable>
                         <v-btn small flat @click="editTeamASingle=false;">Annuler</v-btn>
-                        <v-btn color="grey lighten-2" small @click.native="editTeamASingle=false;composeTeamSingle('A')" :disabled="countMatchPlayed(match) > 0"><v-icon small>save</v-icon>  Enregistrer</v-btn>
+                        <v-btn color="grey lighten-2" small @click.native="editTeamASingle=false;composeTeamSingle('A')" :disabled="countMatchPlayed(match) > 0"><v-icon small class="mr-2">save</v-icon>  Enregistrer</v-btn>
                       </v-flex>
                       <v-flex xs-12 v-if="!editTeamASingle">
                         <div v-for="(gs, index) in match.gamesingle.slice(0,4)" :key="gs.id+'-gss'">
@@ -62,7 +62,7 @@
                             {{ gs.player_home.first_name }} {{ gs.player_home.last_name }}  
                           </v-chip>
                         </div>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamASingle=true"><v-icon small>mode_edit</v-icon>Modifier</v-btn>
+                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamASingle=true"><v-icon small class="mr-2">mode_edit</v-icon>Modifier</v-btn>
                       </v-flex>
                     </v-layout>
                   </v-list>
@@ -77,7 +77,7 @@
                           </v-chip>
                         </div> 
                       </v-flex>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=true"><v-icon small>mode_edit</v-icon> Modifier</v-btn>
+                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
                     </v-layout>
                     <v-layout row wrap v-if="editTeamADouble">
                       <v-flex xs12>
@@ -94,41 +94,56 @@
                       </draggable>
                       </v-flex>
                       <v-btn small flat @click="editTeamADouble=false;">Annuler</v-btn>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=false;composeTeamDouble('A')"><v-icon small>save</v-icon> Enregistrer</v-btn>
+                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=false;composeTeamDouble('A')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
                     </v-layout>
                   </v-list>
             <!-- TEAM A REMPLACANT -->
-                  <v-container class="mt-4" v-if="!editTeamARemplacant">
-                     <v-layout row wrap >
-                       <v-flex xs12>
-                        {{match.team_home.substitute}}
+                   <v-list class="mt-2" >
+                     <v-layout row wrap v-if="!editTeamARemplacant">
+                        <v-subheader v-if="match.substitute_home_player">
+                          {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}} remplace le joueur 
+                          {{match.substitute_home_replace}} après le match n°
+                          {{match.substitute_home_after}}
+                        </v-subheader>
+                        <div>
+                          <v-btn color="grey lighten-4" small @click.native="editTeamARemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
+                        </div>
+                     </v-layout>
+                     <v-layout row wrap v-if="editTeamARemplacant">
+                       <v-flex md4 xs12>
                          <v-select
-                          :items="match.team_home.player.slice(4,20)"
-                          item-value="fullname"
+                          :items="match.team_home.player"
+                          item-value=""
                           item-text="fullname" 
-                          label="Remplaçant A"
+                          label="Remplaçant "
+                          v-model="match.substitute_home_player"
+                          dense
                           single-line
+                          append-icon="compare_arrows"
                         ></v-select>
                        </v-flex>
+                        <v-flex  md4 xs12>
+                          <v-select
+                            :items="['A','B','C','D']"
+                            label="Remplace le joueur"
+                            v-model="match.substitute_home_replace"
+                            dense
+                            single-line
+                          ></v-select>
+                        </v-flex>
+                        <v-flex  md4 xs12>
+                          <v-select
+                            :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
+                            label="Après le match"
+                            v-model="match.substitute_home_after"
+                            dense
+                            single-line
+                          ></v-select>
+                        </v-flex>
+                        <v-btn small flat @click="editTeamARemplacant=false;">Annuler</v-btn>
+                        <v-btn color="grey lighten-2" small @click.native="editTeamARemplacant=false;substitute(match)"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
                      </v-layout>
-                     <v-layout row wrap>
-                      <v-flex xs6>
-                        <v-select
-                          :items="['A','B','C','D']"
-                          label="Remplace le joueur"
-                          dense
-                          single-line
-                        ></v-select>
-                      </v-flex>
-                      <v-flex xs6>
-                        <v-select
-                          :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
-                          label="Après le match"
-                          dense
-                          single-line
-                        ></v-select></v-flex>
-                     </v-layout>
-                  </v-container>
+                  </v-list>
                 </v-flex>
                 <v-flex xs12 md6>
     <!-- TEAM E -->
@@ -145,7 +160,7 @@
                             {{ gs.player_opponent.first_name }} {{ gs.player_opponent.last_name }} <v-avatar class="gray darken-4 ml-2"  > </v-avatar>
                           </v-chip>
                         </div>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=true"><v-icon small>mode_edit</v-icon> Modifier</v-btn>
+                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
                       </v-flex>
                       <v-flex xs-12 v-if="editTeamESingle">
                         <draggable v-model="match.team_opponent.player" @start="drag=true" @end="drag=false">
@@ -162,7 +177,7 @@
                           </transition-group>
                         </draggable>
                         <v-btn small flat @click="editTeamESingle=false;">Annuler</v-btn>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=false;composeTeamSingle('E')"><v-icon small>save</v-icon> Enregistrer</v-btn>
+                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=false;composeTeamSingle('E')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
                       </v-flex>
                       
                     </v-layout>
@@ -178,7 +193,7 @@
                           </v-chip>
                         </div> 
                       </v-flex>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=true"><v-icon small>mode_edit</v-icon> Modifier</v-btn>
+                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
                     </v-layout>
                     <v-layout row wrap v-if="editTeamEDouble">
                       <v-flex xs12>
@@ -195,43 +210,55 @@
                         </draggable>
                       </v-flex>
                       <v-btn small flat @click="editTeamEDouble=false;">Annuler</v-btn>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=false;composeTeamDouble('E')"><v-icon small>save</v-icon> Enregistrer</v-btn>
+                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=false;composeTeamDouble('E')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
                     </v-layout>
                   </v-list>
            <!-- TEAM E REMPLACANT -->
-                  <v-list class="mt-4">
+                  <v-list class="mt-2" >
                      <v-layout row wrap v-if="!editTeamERemplacant">
-                       <v-flex xs12>
-                        <pre>{{match.team_opponent.substitute}}</pre>
-                         <v-select
-                          :items="match.team_opponent.player.slice(4,10)" 
-                          item-text="fullname"
-                          item:value="fullname"
-                          label="Remplaçant E"
-                          single-line
-                        >
-                          <template slot="selection" slot-scope="data">
-                            <div @input="data.parent.selectItem(data.item)" :selected="data.selected" :key="JSON.stringify(data.item)">{{ data.item.fullname }}</div>
-                          </template>
-                        </v-select>
-                       </v-flex>
+                        <v-subheader>
+                          {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace le joueur 
+                          {{match.substitute_opponent_replace}} après le match n°
+                          {{match.substitute_opponent_after}}
+                        </v-subheader>
+                        <div>
+                          <v-btn color="grey lighten-4" small @click.native="editTeamERemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
+                        </div>
                      </v-layout>
-                     <v-layout row wrap>
-                      <v-flex xs6>
-                        <v-select
-                          :items="['E','F','G','H']"
-                          label="Remplace le joueur"
+                     <v-layout row wrap v-if="editTeamERemplacant">
+                      
+                       <v-flex md4 xs12>
+                         <v-select
+                          :items="match.team_opponent.player"
+                          item-value=""
+                          item-text="fullname" 
+                          label="Remplaçant "
+                          v-model="match.substitute_opponent_player"
                           dense
                           single-line
+                          append-icon="compare_arrows"
                         ></v-select>
-                      </v-flex>
-                      <v-flex xs6>
-                        <v-select
-                          :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
-                          label="Après le match"
-                          dense
-                          single-line
-                        ></v-select></v-flex>
+                       </v-flex>
+                        <v-flex  md4 xs12>
+                          <v-select
+                            :items="['E','F','G','H']"
+                            label="Remplace le joueur"
+                            v-model="match.substitute_opponent_replace"
+                            dense
+                            single-line
+                          ></v-select>
+                        </v-flex>
+                        <v-flex  md4 xs12>
+                          <v-select
+                            :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
+                            label="Après le match"
+                            v-model="match.substitute_opponent_after"
+                            dense
+                            single-line
+                          ></v-select>
+                        </v-flex>
+                        <v-btn small flat @click="editTeamERemplacant=false;">Annuler</v-btn>
+                        <v-btn color="grey lighten-2" small @click.native="editTeamERemplacant=false;substitute(match)"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
                      </v-layout>
                   </v-list>
                 </v-flex>
@@ -749,14 +776,12 @@ export default {
     async saveMatch(match) {
       if(this.countMatchPlayed(match) == 20 && this.signatures.length == 2) {
         let that = this
-        console.log(match.id)
         this.$axios.put(`/matches/${match.id}`, {
           score_home: that.totalA(match),
           score_opponent: that.totalE(match),
           signatures: that.signatures.join(',')
         })
         .then(response => {
-          console.warn(response)
           this.played_message.text = "Match enregistré"
           this.played_message.snackbar = true
         })
@@ -764,6 +789,25 @@ export default {
           this.errors.push(e)
         })
       }
+    },
+    async substitute(match) {
+      console.log(match.substitute_opponent_player)
+      let that = this
+      this.$axios.put(`/matches/${match.id}`, {
+        substitute_home_player_id: match.substitute_home_player.id,
+        substitute_home_replace: match.substitute_home_replace,
+        substitute_home_after: match.substitute_home_after,
+        substitute_opponent_player_id: match.substitute_opponent_player.id,
+        substitute_opponent_replace: match.substitute_opponent_replace,
+        substitute_opponent_after: match.substitute_opponent_after
+      })
+      .then(response => {
+        this.played_message.text = "Remplacement effectué"
+        this.played_message.snackbar = true
+      })
+      .catch(e => {
+        this.errors.push(e)
+      })
     }
   }
 }
