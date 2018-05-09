@@ -194,7 +194,7 @@
          <v-layout row wrap v-if="!editTeamERemplacant">
             <v-subheader v-if="match.substitute_opponent_player">
               {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace le joueur 
-              {{match.substitute_opponent_replace}} après le match n°
+              {{match.substitute_opponent_replace}}  après le match n°
               {{match.substitute_opponent_after}}
               <v-btn round icon color="grey lighten-4" small @click.native="match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';substitute(match)"><v-tooltip right><v-icon slot="activator" small class="mr-2" >undo</v-icon><span>Annuler le remplacement</span> </v-tooltip></v-btn>
             </v-subheader>
@@ -375,7 +375,43 @@ export default {
     countMatchPlayed: function(match) {
       return _.filter(match.gamesingle, { played: true}).length + _.filter(match.gamedouble, { played: true}).length
     },
+    // retourne le joueur remplacé
+    getPlayerHomeByLetter: function(match, letter) {
+      let lettersA = ['A','B','C','D']
+      let player = ''
+      if(lettersA.indexOf(letter) !== -1) {
+        _.each(match.gamesingle.slice(0,4), function(gs){
+          if(gs.player_home_letter == letter) {
+            player = gs.player_home
+          }
+        })
+      }
+      return player
+    },
+    // retourne le joueur remplacé
+    getPlayerOpponentByLetter: function(match, letter) {
+      let lettersE = ['E','F','G','H']
+      let player = ''
+      if(lettersE.indexOf(letter) !== -1) {
+        _.each(match.gamesingle.slice(4,8), function(gs){
+          if(gs.player_opponent_letter == letter) {
+            player = gs.player_opponent
+          }
+        })
+      }
+      return player
+    },
     async substitute(match) {
+      if(match.substitute_home_replace) {
+        let player_home_replace = this.getPlayerHomeByLetter(match, match.substitute_home_replace)
+        match.substitute_home_replace_details = player_home_replace
+      }
+      
+      if(match.substitute_opponent_replace) {
+        let player_opponent_replace = this.getPlayerOpponentByLetter(match, match.substitute_opponent_replace)
+        match.substitute_opponent_replace_details = player_opponent_replace
+      }
+
       let that = this
       this.$axios.put(`/matches/${match.id}`, {
         substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
