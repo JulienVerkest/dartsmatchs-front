@@ -1,10 +1,11 @@
 <template>
   <v-layout>
-    <v-flex xs12 sm6 offset-sm3>
-      <nuxt-link :to="{name:'equipes'}">
+    <v-flex xs12>
+<!--       <nuxt-link :to="{name:'equipes'}">
           Retour
-     </nuxt-link>
-      <v-container>
+     </nuxt-link> -->
+     <Mynavigation></Mynavigation>
+      <v-container class="mt-5">
         <h1>{{team.name}} </h1>
         <p>{{team.place.name}} {{team.place.address}} {{team.place.zipcode}} {{team.place.city}}</p>
       </v-container>
@@ -13,9 +14,11 @@
 </template>
 
 <script>
-//import axios from 'axios'
-
+import Mynavigation from '../../components/Navigation'
 export default {
+  components: {
+    Mynavigation
+  },
   validate ({ params }) {
     // Doit être un nombre
     return /^\d+$/.test(params.id)
