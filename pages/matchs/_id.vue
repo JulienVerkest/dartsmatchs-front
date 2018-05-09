@@ -28,246 +28,12 @@
           </v-stepper-header>
           <v-stepper-items>
             <v-stepper-content step="1">
-     <!-- PLAYERS -->
-              <v-layout row wrap>
-                <v-flex xs12 md6>
-          <!-- TEAM A SINGLE -->
-                  <h2>{{match.team_home.name}}</h2>
-                  <v-list>
-                    <v-layout row wrap>
-                      <v-flex xs-12 v-if="editTeamASingle">
-                        <draggable v-model="match.team_home.player" @start="drag=true" @end="drag=false">
-                          <transition-group name="list-complete">
-                            <div v-for="(ph, index) in match.team_home.player" :key="ph.id" class="list-complete-item">
-                              <v-chip disabled outline>
-                                <v-avatar v-if="index==0">A</v-avatar>
-                                <v-avatar v-if="index==1">B</v-avatar>
-                                <v-avatar v-if="index==2">C</v-avatar>
-                                <v-avatar v-if="index==3">D</v-avatar>
-                                {{ ph.first_name }} {{ ph.last_name }}   
-                              </v-chip>
-                            </div> 
-                          </transition-group>
-                        </draggable>
-                        <v-btn small flat @click="editTeamASingle=false;">Annuler</v-btn>
-                        <v-btn color="grey lighten-2" small @click.native="editTeamASingle=false;composeTeamSingle('A')" :disabled="countMatchPlayed(match) > 0"><v-icon small class="mr-2">save</v-icon>  Enregistrer</v-btn>
-                      </v-flex>
-                      <v-flex xs-12 v-if="!editTeamASingle">
-                        <div v-for="(gs, index) in match.gamesingle.slice(0,4)" :key="gs.id+'-gss'">
-                          <v-chip disabled outline>
-                            <v-avatar v-if="index==0">A</v-avatar>
-                            <v-avatar v-if="index==1">B</v-avatar>
-                            <v-avatar v-if="index==2">C</v-avatar>
-                            <v-avatar v-if="index==3">D</v-avatar>
-                            {{ gs.player_home.first_name }} {{ gs.player_home.last_name }}  
-                          </v-chip>
-                        </div>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamASingle=true"><v-icon small class="mr-2">mode_edit</v-icon>Modifier</v-btn>
-                      </v-flex>
-                    </v-layout>
-                  </v-list>
-                  <v-list class="mt-4">
-           <!-- TEAM A DOUBLE -->
-                    <v-layout row wrap v-if="!editTeamADouble">
-                      <v-flex xs12 v-for="(gd, index) in match.gamedouble.slice(0, 2)" :key="gd.id+ '-thd-player'"  > 
-                        <div>
-                          <v-chip disabled outline>
-                            <v-avatar v-if="index==0">A1</v-avatar>
-                            <v-avatar v-if="index==1">A2</v-avatar>{{ gd.double_home.first_player.first_name  }} {{ gd.double_home.first_player.last_name }} et {{ gd.double_home.second_player.first_name }} {{ gd.double_home.second_player.last_name }}
-                          </v-chip>
-                        </div> 
-                      </v-flex>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
-                    </v-layout>
-                    <v-layout row wrap v-if="editTeamADouble">
-                      <v-flex xs12>
-                      <draggable v-model="match.team_home.double" @start="drag=true" @end="drag=false">
-                        <transition-group name="list-complete">
-                          <div v-for="(double_h, index) in match.team_home.double" :key="double_h.id+ '-thd-double-drag'"  class="list-complete-item">
-                            <v-chip disabled outline>
-                              <v-avatar v-if="index==0">A1</v-avatar>
-                              <v-avatar v-if="index==1">A2</v-avatar>
-                              {{ double_h.first_player.first_name  }} {{ double_h.first_player.last_name }} et {{ double_h.second_player.first_name }} {{ double_h.second_player.last_name }}  
-                            </v-chip>
-                          </div> 
-                        </transition-group>
-                      </draggable>
-                      </v-flex>
-                      <v-btn small flat @click="editTeamADouble=false;">Annuler</v-btn>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamADouble=false;composeTeamDouble('A')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
-                    </v-layout>
-                  </v-list>
-            <!-- TEAM A REMPLACANT -->
-                   <v-list class="mt-2" >
-                     <v-layout row wrap v-if="!editTeamARemplacant">
-                        <v-subheader v-if="match.substitute_home_player">
-                          {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}} remplace le joueur 
-                          {{match.substitute_home_replace}} après le match n°
-                          {{match.substitute_home_after}}
-                           <v-btn color="grey lighten-4" small @click.native="match.substitute_home_player=null;match.substitute_home_replace='';match.substitute_home_after='';substitute(match)"><v-icon small class="mr-2" >undo</v-icon> Annuler le remplacement </v-btn>
-                        </v-subheader>
-                        <div>
-                          <v-btn color="grey lighten-4" small @click.native="editTeamARemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
-                        </div>
-                     </v-layout>
-                     <v-layout row wrap v-if="editTeamARemplacant">
-                       <v-flex md4 xs12>
-                         <v-select
-                          :items="match.team_home.player"
-                          item-value=""
-                          item-text="fullname" 
-                          label="Remplaçant "
-                          v-model="match.substitute_home_player"
-                          dense
-                          single-line
-                          append-icon="compare_arrows"
-                        ></v-select>
-                       </v-flex>
-                        <v-flex  md4 xs12>
-                          <v-select
-                            :items="['A','B','C','D']"
-                            label="Remplace le joueur"
-                            v-model="match.substitute_home_replace"
-                            dense
-                            single-line
-                          ></v-select>
-                        </v-flex>
-                        <v-flex  md4 xs12>
-                          <v-select
-                            :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
-                            label="Après le match"
-                            v-model="match.substitute_home_after"
-                            dense
-                            single-line
-                          ></v-select>
-                        </v-flex>
-                        <v-btn small flat @click="editTeamARemplacant=false;">Annuler</v-btn>
-                        <v-btn color="grey lighten-2" small @click.native="editTeamARemplacant=false;substitute(match)"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
-                     </v-layout>
-                  </v-list>
-                </v-flex>
-                <v-flex xs12 md6>
-    <!-- TEAM E -->
-                  <h2>{{match.team_opponent.name}}</h2>
-                  <v-list>
-                    <v-layout row wrap>
-                      <v-flex xs-12 v-if="!editTeamESingle">
-                        <div v-for="(gs, index) in match.gamesingle.slice(4,8)" :key="gs.id+'-gss'">
-                          <v-chip disabled outline>
-                            <v-avatar v-if="index==0">E</v-avatar>
-                            <v-avatar v-if="index==1">F</v-avatar>
-                            <v-avatar v-if="index==2">G</v-avatar>
-                            <v-avatar v-if="index==3">H</v-avatar>
-                            {{ gs.player_opponent.first_name }} {{ gs.player_opponent.last_name }} <v-avatar class="gray darken-4 ml-2"  > </v-avatar>
-                          </v-chip>
-                        </div>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
-                      </v-flex>
-                      <v-flex xs-12 v-if="editTeamESingle">
-                        <draggable v-model="match.team_opponent.player" @start="drag=true" @end="drag=false">
-                          <transition-group name="list-complete">
-                            <div v-for="(po, index) in match.team_opponent.player" :key="po.id" class="list-complete-item">
-                              <v-chip disabled outline>
-                                <v-avatar v-if="index==0">E</v-avatar>
-                                <v-avatar v-if="index==1">F</v-avatar>
-                                <v-avatar v-if="index==2">G</v-avatar>
-                                <v-avatar v-if="index==3">H</v-avatar>
-                                {{ po.first_name }} {{ po.last_name }}   
-                              </v-chip>
-                            </div> 
-                          </transition-group>
-                        </draggable>
-                        <v-btn small flat @click="editTeamESingle=false;">Annuler</v-btn>
-                        <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamESingle=false;composeTeamSingle('E')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
-                      </v-flex>
-                      
-                    </v-layout>
-                  </v-list>
-                  <v-list class="mt-4">
-                    <v-layout row wrap v-if="!editTeamEDouble">
-                      <v-flex xs12 v-for="(gd, index) in match.gamedouble.slice(0, 2)" :key="gd.id+ '-thd-player'"  > 
-                        <div>
-                          <v-chip disabled  outline>
-                            <v-avatar v-if="index==0">A1</v-avatar>
-                            <v-avatar v-if="index==1">A2</v-avatar>
-                            <v-avatar class="gray darken-4" v-if="false"><v-icon>check_circle</v-icon></v-avatar>{{ gd.double_opponent.first_player.first_name  }} {{ gd.double_opponent.first_player.last_name }} et {{ gd.double_opponent.second_player.first_name }} {{ gd.double_opponent.second_player.last_name }}
-                          </v-chip>
-                        </div> 
-                      </v-flex>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=true"><v-icon small class="mr-2">mode_edit</v-icon> Modifier</v-btn>
-                    </v-layout>
-                    <v-layout row wrap v-if="editTeamEDouble">
-                      <v-flex xs12>
-                        <draggable v-model="match.team_opponent.double" @start="drag=true" @end="drag=false">
-                          <transition-group name="list-complete">
-                            <div v-for="(double_o, index) in match.team_opponent.double" :key="double_o.id+ '-thd-double-drag'"  class="list-complete-item">
-                              <v-chip disabled outline>
-                                <v-avatar v-if="index==0">E1</v-avatar>
-                                <v-avatar v-if="index==1">E2</v-avatar>
-                                {{ double_o.first_player.first_name  }} {{ double_o.first_player.last_name }} et {{ double_o.second_player.first_name }} {{ double_o.second_player.last_name }}  
-                              </v-chip>
-                            </div> 
-                          </transition-group>
-                        </draggable>
-                      </v-flex>
-                      <v-btn small flat @click="editTeamEDouble=false;">Annuler</v-btn>
-                      <v-btn :disabled="countMatchPlayed(match) > 0" color="grey lighten-2" small @click.native="editTeamEDouble=false;composeTeamDouble('E')"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
-                    </v-layout>
-                  </v-list>
-           <!-- TEAM E REMPLACANT -->
-                  <v-list class="mt-2" >
-                     <v-layout row wrap v-if="!editTeamERemplacant">
-                        <v-subheader v-if="match.substitute_opponent_player">
-                          {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace le joueur 
-                          {{match.substitute_opponent_replace}} après le match n°
-                          {{match.substitute_opponent_after}}
-                          <v-btn color="grey lighten-4" small @click.native="match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';substitute(match)"><v-icon small class="mr-2" >undo</v-icon> Annuler le remplacement </v-btn>
-                        </v-subheader>
-                        <div>
-                          <v-btn color="grey lighten-4" small @click.native="editTeamERemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
-                        </div>
-                     </v-layout>
-                     <v-layout row wrap v-if="editTeamERemplacant">
-                      
-                       <v-flex md4 xs12>
-                         <v-select
-                          :items="match.team_opponent.player"
-                          item-value=""
-                          item-text="fullname" 
-                          label="Remplaçant "
-                          v-model="match.substitute_opponent_player"
-                          dense
-                          single-line
-                          append-icon="compare_arrows"
-                        ></v-select>
-                       </v-flex>
-                        <v-flex  md4 xs12>
-                          <v-select
-                            :items="['E','F','G','H']"
-                            label="Remplace le joueur"
-                            v-model="match.substitute_opponent_replace"
-                            dense
-                            single-line
-                          ></v-select>
-                        </v-flex>
-                        <v-flex  md4 xs12>
-                          <v-select
-                            :items="[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]"
-                            label="Après le match"
-                            v-model="match.substitute_opponent_after"
-                            dense
-                            single-line
-                          ></v-select>
-                        </v-flex>
-                        <v-btn small flat @click="editTeamERemplacant=false;">Annuler</v-btn>
-                        <v-btn color="grey lighten-2" small @click.native="editTeamERemplacant=false;substitute(match)"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
-                     </v-layout>
-                  </v-list>
-                </v-flex>
-              </v-layout>  
-              <v-layout align-end justify-end>      
-                <v-btn color="primary" @click.native="e1 = 2">Etape suivante <v-icon>chevron_right</v-icon></v-btn>
-              </v-layout>
+      <!-- PLAYERS -->
+            <Players v-bind:match="match" >
+            </Players>
+            <v-layout align-end justify-end>      
+              <v-btn color="primary" @click.native="e1 = 2">Etape suivante <v-icon>chevron_right</v-icon></v-btn>
+            </v-layout>
             </v-stepper-content>
             <v-stepper-content step="2">
     <!-- MATCHS -->
@@ -275,15 +41,18 @@
                 <v-flex xs12 md9>
                   <v-layout row wrap>
                     <!-- SINGLES -->
-                    <v-flex xs6 md3 v-for="game in match.gamesingle" :key="game.id+ '-gs'"> 
+                    <v-flex xs6 md3 v-for="(game,index) in match.gamesingle" :key="game.id+ '-gs'"> 
                       <v-card tile> 
                         <v-toolbar dense flat>
                           <v-toolbar-title>{{game.name}} </v-toolbar-title>
                         </v-toolbar>
                         <div class="pl-2 pr-1 py-2"> 
                           <div class="mb-4">
-                            <span v-bind:class="{ start: game.player_start_letter === game.player_home_letter }">{{game.player_home_letter}}) </span>
-                            <span class="caption">{{game.player_home.first_name}} {{game.player_home.last_name}}</span>
+                            <div style="min-height:45px">
+                              <span v-bind:class="{ start: game.player_start_letter === game.player_home_letter }">{{game.player_home_letter}}) </span>
+                              <span class="caption">{{game.player_home.first_name}} {{game.player_home.last_name}}</span>
+                              <span class="green lighten-5" v-if="match.substitute_home_player && match.substitute_home_after<=index+1 && game.player_home_letter==match.substitute_home_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}}</span>
+                            </div>
                           </div>
                           <v-layout row wrap class="ma-0 pa-0">
                             <v-flex xs3 class="ma-0 pa-0">
@@ -304,25 +73,31 @@
                             </v-flex>
                           </v-layout>
                           <div class="ma-0 pa-0">
-                            <span v-bind:class="{ start: game.player_start_letter === game.player_opponent_letter }">{{game.player_opponent_letter}} ) </span>
-                            <span class="caption text-xs-left">{{game.player_opponent.first_name}} {{game.player_opponent.last_name}}</span> 
+                            <div style="min-height:45px">
+                              <span v-bind:class="{ start: game.player_start_letter === game.player_opponent_letter }">{{game.player_opponent_letter}} ) </span>
+                              <span class="caption text-xs-left">{{game.player_opponent.first_name}} {{game.player_opponent.last_name}}</span> 
+                              <span class="blue lighten-5" v-if="match.substitute_opponent_player && match.substitute_opponent_after<=index+1 && game.player_opponent_letter==match.substitute_opponent_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}}</span>
+                            </div>
+
                           </div>
                           <div class="mt-4">
-                            <v-switch @change="saveGameSingle(game)" color="gray" :label="`Match terminé ${game.played==true ? '!' : '?'}`" v-model="game.played"></v-switch>
+                            <v-switch @change="saveGameSingle(game)" color="gray" :label="`Match terminé ${game.played==true ? '!' : '?'}`" v-model="game.played" :disabled="rulesMatchSingle(game)"></v-switch>
                           </div>
                         </div>
                       </v-card>
                     </v-flex>
                     <!-- DOUBLES -->
-                    <v-flex xs6 md3 v-for="double in match.gamedouble" :key="double.id+ '-gd'"> 
-                      <v-card tile>
+                    <v-flex xs6 md3 v-for="double in match.gamedouble" :key="double.id+ '-gd'" class="mt-4"> 
+                      <v-card tile  >
                         <v-toolbar dense flat card>
                           <v-toolbar-title>{{double.name}} </v-toolbar-title>
                         </v-toolbar>
                         <div class="pl-2 pr-1 py-2">
                           <div class="mb-4"> 
-                            <span v-bind:class="{ start: double.double_start_letter === double.double_home_letter }">{{double.double_home_letter}}) </span>
-                            <span class="caption">{{double.double_home.first_player.first_name}} {{double.double_home.first_player.last_name}} et {{double.double_home.second_player.first_name}} {{double.double_home.second_player.last_name}}</span> 
+                            <div style="min-height:45px">
+                              <span v-bind:class="{ start: double.double_start_letter === double.double_home_letter }">{{double.double_home_letter}}) </span>
+                              <span class="caption">{{double.double_home.first_player.first_name}} {{double.double_home.first_player.last_name}} et {{double.double_home.second_player.first_name}} {{double.double_home.second_player.last_name}}</span> 
+                            </div>
                           </div>
                           <v-layout row wrap>
                             <v-flex xs3>
@@ -343,11 +118,13 @@
                             </v-flex>
                           </v-layout>
                           <div class="ma-0 pa-0">
-                            <span v-bind:class="{ start: double.double_start_letter === double.double_opponent_letter }">{{double.double_opponent_letter}}) </span>
-                            <span class="caption">{{double.double_opponent.first_player.first_name}} {{double.double_opponent.first_player.last_name}} et {{double.double_opponent.second_player.first_name}} {{double.double_opponent.second_player.last_name}}</span> 
+                            <div style="min-height:45px">
+                              <span v-bind:class="{ start: double.double_start_letter === double.double_opponent_letter }">{{double.double_opponent_letter}}) </span>
+                              <span class="caption">{{double.double_opponent.first_player.first_name}} {{double.double_opponent.first_player.last_name}} et {{double.double_opponent.second_player.first_name}} {{double.double_opponent.second_player.last_name}}</span> 
+                            </div>
                           </div>
                           <div class="mt-4">
-                            <v-switch @change="saveGameDouble(double)"  color="gray" :label="`Match terminé ${double.played==true ? '!' : '?'}`" v-model="double.played"></v-switch>
+                            <v-switch @change="saveGameDouble(double)"  color="gray" :label="`Match terminé ${double.played==true ? '!' : '?'}`" v-model="double.played" :disabled="rulesMatchDouble(double)" ></v-switch>
                           </div>
                         </div>
                       </v-card>
@@ -356,14 +133,19 @@
                 </v-flex>
                 <v-flex xs12 md3 >
                   <table class="table table-bordered hidden-md-and-down" >
-                    <thead>
+<!--                     <thead>
                       <tr>
                         <th>A</th>
                         <th>SCORE</th>
                         <th>E</th>
                       </tr>
-                    </thead> 
+                    </thead>  -->
                     <tbody>
+                      <tr>
+                        <td><b>A</b></td>
+                        <td><b>SCORE</b></td>
+                        <td><b>E</b></td>
+                      </tr>
                       <tr v-for="match in match.gamesingle" :key="match.id+ '-matchsingle'">
                        <td>{{ match.pts1 }}</td>
                        <td><small>{{ match.name }}</small></td>
@@ -374,6 +156,11 @@
                        <td><small>{{ d.name }}</small></td>
                        <td>{{ d.pts2 }}</td>
                      </tr>
+                     <tr>
+                        <td><b>{{totalA(match)}}</b></td>
+                        <td>-</td>
+                        <td><b>{{totalE(match)}}</b></td>
+                      </tr>
                     </tbody>
                   </table>
                 </v-flex>
@@ -421,16 +208,7 @@
             </v-stepper-content>
           </v-stepper-items>
           </v-stepper> 
-          <v-snackbar
-            :timeout="played_message.timeout"
-            :color="played_message.color"
-            :multi-line="played_message.mode === 'multi-line'"
-            :vertical="played_message.mode === 'vertical'"
-            v-model="played_message.snackbar"
-          >
-            {{ played_message.text }}
-            <v-btn dark flat @click.native="played_message.snackbar = false">Fermer</v-btn>
-          </v-snackbar>
+          <Mysnackbar v-bind:playedmessage="playedmessage"></Mysnackbar>
       </v-container> 
     </v-flex>
   </v-layout>
@@ -439,13 +217,15 @@
 <script>
 //import axios from 'axios'
 import _ from 'lodash'
-import draggable from 'vuedraggable'
 import Mynavigation from '../../components/Navigation'
+import Mysnackbar from '../../components/Snackbar'
+import Players from '../../components/Players'
 
 export default {
   components: {
-    draggable,
-    Mynavigation
+    Mynavigation,
+    Mysnackbar,
+    Players
   },
   validate ({ params }) {
     // Doit être un nombre
@@ -454,13 +234,7 @@ export default {
   data () {
     return {
       signatures: [],
-      editTeamASingle: false,
-      editTeamESingle: false,
-      editTeamADouble: false,
-      editTeamEDouble: false,
-      editTeamERemplacant: false,
-      editTeamARemplacant: false,
-      played_message: {
+      playedmessage: {
         snackbar: false,
         color: '',
         mode: '',
@@ -511,117 +285,6 @@ export default {
     }
   },
   methods: {
-    async composeTeamSingle (team='A'){
-      let match = this.match
-      let that = this
-      const upds = []
-      _.each(this.match.gamesingle, function(game){
-        if(team==='A') {
-          let home = ['A', 'B', 'C', 'D'];
-          _.each(home, function(letter, index){
-            if(game.player_home_letter == letter) { 
-              game.player_home_id = match.team_home.player[index].id;
-              game.player_home = match.team_home.player[index];
-              if(game.player_start_letter == letter) { 
-                game.player_start_id = match.team_home.player[index].id;
-                game.player_start = match.team_home.player[index];
-              }
-              let upd = that.$axios.put('/gamesingles/'+game.id, {
-                player_home_id: game.player_home.id,
-                player_start_id: game.player_start.id
-              })
-              upds.push(upd)
-            }
-          });
-        }
-
-        if(team==='E') {
-          let opponent = ['E','F','G','H'];
-          _.each(opponent, function(letter, index){
-            if(game.player_opponent_letter == letter) { 
-              game.player_opponent_id = match.team_opponent.player[index].id;
-              game.player_opponent = match.team_opponent.player[index];
-              if(game.player_start_letter == letter) { 
-                game.player_start_id = match.team_opponent.player[index].id;
-                game.player_start = match.team_opponent.player[index];
-              }
-              let upd = that.$axios.put('/gamesingles/'+game.id, {
-                player_opponent_id: game.player_opponent.id,
-                player_start_id: game.player_start.id
-              })
-              upds.push(upd)
-            }
-          });
-        }
-      });
-      Promise.all(upds).then(values => { 
-        this.played_message.text = "Composition des joueurs modifiée avec succès"
-        this.played_message.snackbar = true
-      }).catch(reason => { 
-        
-      });
-    },
-    async composeTeamDouble (team='A'){
-      let match = this.match
-      let that = this
-      const upds = []
-      _.each(this.match.gamedouble, function(game){
-        if(team==='A') {
-          let home = ['A1', 'A2'];
-          _.each(home, function(letter, index){
-            if(game.double_home_letter == letter) { 
-              game.double_home_id = match.team_home.double[index].id;
-              game.double_home = match.team_home.double[index];
-              if(game.double_start_letter == letter) { 
-                game.double_start_id = match.team_home.double[index].id;
-                game.double_start = match.team_home.double[index];
-              }
-              let upd = that.$axios.put('/gamedoubles/'+game.id, {
-                double_home_id: game.double_home.id,
-                double_start_id: game.double_start.id
-              })
-              upds.push(upd)
-            }
-          });
-        }
-        if(team==='E') {
-          let opponent = ['E1', 'E2'];
-          _.each(opponent, function(letter, index){
-            if(game.double_opponent_letter == letter) { 
-              game.double_opponent_id = match.team_opponent.double[index].id;
-              game.double_opponent = match.team_opponent.double[index];
-              if(game.double_start_letter == letter) { 
-                game.double_start_id = match.team_opponent.double[index].id;
-                game.double_start = match.team_opponent.double[index];
-              }
-              let upd = that.$axios.put('/gamedoubles/'+game.id, {
-                double_opponent_id: game.double_opponent.id,
-                double_start_id: game.double_start.id
-              })
-              upds.push(upd)
-            }
-          });
-        }
-      });
-      Promise.all(upds).then(values => { 
-        this.played_message.text = "Composition des joueurs modifiée avec succès"
-        this.played_message.snackbar = true
-      }).catch(reason => { 
-        console.log(reason)
-      });
-
-    },
-    // async loadPlayers(game) {
-    //   this.$axios.get('/gamesingles/'+game.id, {
-
-    //   })
-    //   .then(response => {
-         
-    //   })
-    //   .catch(e => {
-    //     this.errors.push(e)
-    //   })
-    // },
     countMatchPlayed: function(match) {
       return _.filter(match.gamesingle, { played: true}).length + _.filter(match.gamedouble, { played: true}).length
     },
@@ -717,6 +380,50 @@ export default {
         return 'match nul'
       }
     },
+    rulesMatchSingle: function(game) {
+      let r = false
+      if(game.leg1ph+game.leg2ph+game.leg3ph==3 || game.leg1po+game.leg2po+game.leg3po==3) {
+        r = true
+      }
+      if(game.leg1ph+game.leg2ph == 2 && game.leg3po == 1 || game.leg1po+game.leg2po == 2 && game.leg3ph == 1) {
+        r = true
+      }
+      if(game.leg1ph+game.leg2ph+game.leg3ph+game.leg1po+game.leg2po+game.leg3po<2) {
+        r = true
+      }
+      if((game.leg1ph+game.leg2ph == 2 && game.leg3po == 1) || (game.leg1po+game.leg2po == 2 && game.leg3ph == 1)) {
+        r = true
+      }
+      if(game.leg1ph+game.leg2ph+game.leg3ph==1 && game.leg1po+game.leg2po+game.leg3po==1) {
+        r = true
+      }
+      if(game.leg1ph+game.leg1po == 0 || game.leg2ph+game.leg2po==0) {
+        r = true
+      }
+      return r
+    },
+    rulesMatchDouble: function(double) {
+      let r = false
+      if(double.leg1dh+double.leg2dh+double.leg3dh==3 || double.leg1do+double.leg2do+double.leg3do==3) {
+        r = true
+      }
+      if(double.leg1dh+double.leg2dh == 2 && double.leg3do == 1 || double.leg1do+double.leg2do == 2 && double.leg3dh == 1) {
+        r = true
+      }
+      if(double.leg1dh+double.leg2dh+double.leg3dh+double.leg1do+double.leg2do+double.leg3do<2) {
+        r = true
+      }
+      if((double.leg1dh+double.leg2dh == 2 && double.leg3do == 1) || (double.leg1do+double.leg2do == 2 && double.leg3dh == 1)) {
+        r = true
+      }
+      if(double.leg1dh+double.leg2dh+double.leg3dh==1 && double.leg1do+double.leg2do+double.leg3do==1) {
+        r = true
+      }
+      if(double.leg1dh+double.leg1do == 0 || double.leg2dh+double.leg2do==0) {
+        r = true
+      }
+      return r
+    },
     async saveGameSingle(game) {
       if(game.played === false) {
         game.leg1ph = 0
@@ -725,10 +432,10 @@ export default {
         game.leg1po = 0
         game.leg2po = 0
         game.leg3po = 0
-        this.played_message.text = "Score du match remis à zéro"
+        this.playedmessage.text = "Score du match remis à zéro"
       }
       else {
-        this.played_message.text = `Score du ${game.name} enregistré `
+        this.playedmessage.text = `Score du ${game.name} enregistré ` // snackbar
       }
       this.$axios.put('/gamesingles/'+game.id, {
         leg1ph: game.leg1ph,
@@ -740,7 +447,7 @@ export default {
         played: game.played
       })
       .then(response => {
-        this.played_message.snackbar = true
+        this.playedmessage.snackbar = true
       })
       .catch(e => {
         this.errors.push(e)
@@ -754,10 +461,10 @@ export default {
         double.leg1do = 0
         double.leg2do = 0
         double.leg3do = 0
-        this.played_message.text = "Score du match remis à zéro"
+        this.playedmessage.text = "Score du match remis à zéro"
       }
       else {
-        this.played_message.text = `Score du ${double.name} enregistré `
+        this.playedmessage.text = `Score du ${double.name} enregistré `
       }
       this.$axios.put('/gamedoubles/'+double.id, {
         leg1dh: double.leg1dh,
@@ -769,7 +476,7 @@ export default {
         played: double.played
       })
       .then(response => {
-        this.played_message.snackbar = true
+        this.playedmessage.snackbar = true
       })
       .catch(e => {
         this.errors.push(e)
@@ -784,8 +491,8 @@ export default {
           signatures: that.signatures.join(',')
         })
         .then(response => {
-          this.played_message.text = "Match enregistré"
-          this.played_message.snackbar = true
+          this.playedmessage.text = "Match enregistré"
+          this.playedmessage.snackbar = true
         })
         .catch(e => {
           this.errors.push(e)
@@ -803,8 +510,8 @@ export default {
         substitute_opponent_after: match.substitute_opponent_after
       })
       .then(response => {
-        this.played_message.text = "Remplacement effectué"
-        this.played_message.snackbar = true
+        this.playedmessage.text = "Remplacement effectué"
+        this.playedmessage.snackbar = true
       })
       .catch(e => {
         this.errors.push(e)
