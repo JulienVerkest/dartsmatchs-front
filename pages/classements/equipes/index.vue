@@ -12,7 +12,7 @@
             <td>{{ props.item.won }}</td>
             <td>{{ props.item.draw }}</td>
             <td>{{ props.item.lost }}</td>
-            <td>{{ props.item.Hpts }}</td>
+            <!-- <td>{{ props.item.Hpts }}</td>
             <td>{{ props.item.Hplayed }}</td>
             <td>{{ props.item.Hwon }}</td>
             <td>{{ props.item.Hdraw }}</td>
@@ -21,7 +21,7 @@
             <td>{{ props.item.Oplayed }}</td>
             <td>{{ props.item.Owon }}</td>
             <td>{{ props.item.Odraw }}</td>
-            <td>{{ props.item.Olost }}</td>
+            <td>{{ props.item.Olost }}</td> -->
           </template>
         </v-data-table>      
       </v-list>
@@ -43,23 +43,22 @@ export default {
       active: null,
       headersMatchs: [
         { text: '', value: 'index', sortable: false},
-        { text: '', value: 'index'},
         { text: 'Equipe', value: 'team'},
         { text: 'Pts', value: 'pts'},
         { text: 'J', value: 'j'},
         { text: 'G', value: 'g'},
         { text: 'N', value: 'n'},
         { text: 'D', value: 'd'},
-        { text: 'Domicile Pts', value: 'hpts'},
-        { text: 'J', value: 'hj'},
-        { text: 'G', value: 'hg'},
-        { text: 'N', value: 'hn'},
-        { text: 'D', value: 'hd'},
-        { text: 'Extérieur Pts', value: 'Opts'},
-        { text: 'J', value: 'Oj'},
-        { text: 'G', value: 'Og'},
-        { text: 'N', value: 'On'},
-        { text: 'D', value: 'Od'}
+        // { text: 'Domicile Pts', value: 'hpts'},
+        // { text: 'J', value: 'hj'},
+        // { text: 'G', value: 'hg'},
+        // { text: 'N', value: 'hn'},
+        // { text: 'D', value: 'hd'},
+        // { text: 'Extérieur Pts', value: 'Opts'},
+        // { text: 'J', value: 'Oj'},
+        // { text: 'G', value: 'Og'},
+        // { text: 'N', value: 'On'},
+        // { text: 'D', value: 'Od'}
       ]
     }
   },

@@ -424,10 +424,10 @@ export default {
     },
     async updateAfterSubstittuteGameSingle(match) {
       let that = this
-      _.each(match.gamesingle, function(game){
+      _.each(match.gamesingle, function(game, index){
         if(match.substitute_home_replace) {
           let player_home_replace = that.getPlayerHomeByLetter(match, match.substitute_home_replace) 
-          if(player_home_replace.id==game.player_home.id) {
+          if(player_home_replace.id==game.player_home.id && match.substitute_home_after<=index+1) {
             game.substitute_home_player = match.substitute_home_player
           }
           else {
@@ -440,7 +440,7 @@ export default {
         
         if(match.substitute_opponent_replace) {
           let player_opponent_replace = that.getPlayerOpponentByLetter(match, match.substitute_opponent_replace) 
-          if(player_opponent_replace.id==game.player_opponent.id) {
+          if(player_opponent_replace.id==game.player_opponent.id && match.substitute_opponent_after<=index+1) {
             game.substitute_opponent_player = match.substitute_opponent_player
           }
           else {

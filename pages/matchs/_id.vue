@@ -189,7 +189,7 @@
                     </div>
                   </v-card>
                 </v-flex>
-                <v-flex xs7 md7>
+                <v-flex xs7 md7 v-if="match.signatures==''">
                   <v-card tile>
                       <v-toolbar dense flat>
                         <v-toolbar-title>Signature des capitaines</v-toolbar-title>
@@ -205,7 +205,8 @@
               <v-layout row wrap>
                 <v-btn color="gray" @click.native="e1 = 2"><v-icon>chevron_left</v-icon>Etape 2</v-btn> 
                 <v-spacer></v-spacer>
-                <v-btn color="primary" :disabled="countMatchPlayed(match)!=20" @click.native="saveMatch(match)">Envoyer la feuille de match </v-btn>
+                <v-btn v-if="match.signatures==''" color="primary" :disabled="countMatchPlayed(match)!=20" @click.native="saveMatch(match)">Envoyer la feuille de match </v-btn>
+
               </v-layout>
 
             </v-stepper-content>

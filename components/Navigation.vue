@@ -1,13 +1,15 @@
 <template>
   <v-toolbar dense light fixed>
-    <v-toolbar-items class="hidden-sm-and-down">
+    <v-toolbar-items >
       <v-btn nuxt :to="{name:'matchs'}">Matchs</v-btn>
-      <v-btn nuxt :to="{name:'equipes'}">Equipes</v-btn> 
       <v-btn nuxt :to="{name:'classements-equipes'}">Classements Equipes</v-btn>
       <v-btn nuxt :to="{name:'classements-simples'}">Classements Simples</v-btn>
       <v-btn nuxt :to="{name:'classements-doubles'}">Classements Doubles</v-btn>
     </v-toolbar-items > 
     <v-spacer></v-spacer>
+    <v-toolbar-items >
+      <v-btn class="hidden-sm-and-down" nuxt :to="{name:'equipes'}">Equipes</v-btn> 
+    </v-toolbar-items > 
     <v-toolbar-title>
       Déconnexion
     </v-toolbar-title>
