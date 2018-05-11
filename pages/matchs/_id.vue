@@ -51,7 +51,8 @@
                             <div style="min-height:45px">
                               <span v-bind:class="{ start: game.player_start_letter === game.player_home_letter }">{{game.player_home_letter}}) </span>
                               <span class="caption">{{game.player_home.first_name}} {{game.player_home.last_name}}</span>
-                              <span class="green lighten-5" v-if="match.substitute_home_player && match.substitute_home_after<=index+1 && game.player_home_letter==match.substitute_home_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}}</span>
+                              <span class="green lighten-5" v-if="match.substitute_home_player && match.substitute_home_after<=index+1 && game.player_home_letter==match.substitute_home_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}}
+                              </span>
                             </div>
                           </div>
                           <v-layout row wrap class="ma-0 pa-0">
@@ -76,7 +77,9 @@
                             <div style="min-height:45px">
                               <span v-bind:class="{ start: game.player_start_letter === game.player_opponent_letter }">{{game.player_opponent_letter}} ) </span>
                               <span class="caption text-xs-left">{{game.player_opponent.first_name}} {{game.player_opponent.last_name}}</span> 
-                              <span class="blue lighten-5" v-if="match.substitute_opponent_player && match.substitute_opponent_after<=index+1 && game.player_opponent_letter==match.substitute_opponent_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}}</span>
+                              <span class="blue lighten-5" v-if="match.substitute_opponent_player && match.substitute_opponent_after<=index+1 && game.player_opponent_letter==match.substitute_opponent_replace"><v-icon>compare_arrows</v-icon> {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}}
+                              
+                              </span>
                             </div>
 
                           </div>
@@ -273,8 +276,8 @@ export default {
     };
     let { data } = await app.$axios.get(`/matches/${params.id}`)
     data = addFullName(data);
-    data = getRemplacantsA(data);
-    data = getRemplacantsE(data);
+    //data = getRemplacantsA(data);
+    //data = getRemplacantsE(data);
     return { 
       match: data
     }
@@ -444,7 +447,10 @@ export default {
         leg1po: game.leg1po,
         leg2po: game.leg2po,
         leg3po: game.leg3po,
-        played: game.played
+        played: game.played,
+        substitute_opponent_player_id: game.substitute_opponent_player ? game.substitute_opponent_player.id : null,
+        substitute_home_player_id: game.substitute_home_player ? game.substitute_home_player.id :null
+
       })
       .then(response => {
         this.playedmessage.snackbar = true
@@ -498,25 +504,7 @@ export default {
           this.errors.push(e)
         })
       }
-    },
-    async substitute(match) {
-      let that = this
-      this.$axios.put(`/matches/${match.id}`, {
-        substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
-        substitute_home_replace: match.substitute_home_replace,
-        substitute_home_after: match.substitute_home_after,
-        substitute_opponent_player_id: match.substitute_opponent_player ? match.substitute_opponent_player.id : null,
-        substitute_opponent_replace: match.substitute_opponent_replace,
-        substitute_opponent_after: match.substitute_opponent_after
-      })
-      .then(response => {
-        this.playedmessage.text = "Remplacement effectué"
-        this.playedmessage.snackbar = true
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
-    }
+    } 
   }
 }
 </script> 

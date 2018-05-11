@@ -79,7 +79,7 @@
                 <v-btn round icon color="grey lighten-4" small @click.native="match.substitute_home_player=null;match.substitute_home_replace='';match.substitute_home_after='';substitute(match)"><v-tooltip right><v-icon slot="activator" small class="mr-2" >undo</v-icon><span>Annuler le remplacement</span> </v-tooltip></v-btn>
             </v-subheader>
             <div>
-              <v-btn round color="grey lighten-4" small @click.native="editTeamARemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
+              <v-btn round color="grey lighten-4" small @click.native="editTeamARemplacant=true;match.signatures==''"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
             </div>
          </v-layout>
          <v-layout row wrap v-if="editTeamARemplacant">
@@ -199,7 +199,7 @@
               <v-btn round icon color="grey lighten-4" small @click.native="match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';substitute(match)"><v-tooltip right><v-icon slot="activator" small class="mr-2" >undo</v-icon><span>Annuler le remplacement</span> </v-tooltip></v-btn>
             </v-subheader>
             <div>
-              <v-btn round color="grey lighten-4" small @click.native="editTeamERemplacant=true;"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
+              <v-btn round color="grey lighten-4" small @click.native="editTeamERemplacant=true;match.signatures==''"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
             </div>
          </v-layout>
          <v-layout row wrap v-if="editTeamERemplacant">
@@ -402,15 +402,7 @@ export default {
       return player
     },
     async substitute(match) {
-      if(match.substitute_home_replace) {
-        let player_home_replace = this.getPlayerHomeByLetter(match, match.substitute_home_replace)
-        match.substitute_home_replace_details = player_home_replace
-      }
-      
-      if(match.substitute_opponent_replace) {
-        let player_opponent_replace = this.getPlayerOpponentByLetter(match, match.substitute_opponent_replace)
-        match.substitute_opponent_replace_details = player_opponent_replace
-      }
+
 
       let that = this
       this.$axios.put(`/matches/${match.id}`, {
@@ -424,9 +416,46 @@ export default {
       .then(response => {
         this.playedmessage.text = "Remplacement effectué"
         this.playedmessage.snackbar = true
+        this.updateAfterSubstittuteGameSingle(match)
       })
       .catch(e => {
         this.errors.push(e)
+      })
+    },
+    async updateAfterSubstittuteGameSingle(match) {
+      let that = this
+      _.each(match.gamesingle, function(game){
+        if(match.substitute_home_replace) {
+          let player_home_replace = that.getPlayerHomeByLetter(match, match.substitute_home_replace) 
+          if(player_home_replace.id==game.player_home.id) {
+            game.substitute_home_player = match.substitute_home_player
+          }
+          else {
+            game.substitute_home_player = null
+          }
+        }
+        else {
+          game.substitute_home_player = null
+        }
+        
+        if(match.substitute_opponent_replace) {
+          let player_opponent_replace = that.getPlayerOpponentByLetter(match, match.substitute_opponent_replace) 
+          if(player_opponent_replace.id==game.player_opponent.id) {
+            game.substitute_opponent_player = match.substitute_opponent_player
+          }
+          else {
+            game.substitute_opponent_player = null
+          }
+        }
+        else {
+          game.substitute_opponent_player = null
+        }
+        that.$axios.put('/gamesingles/'+game.id, {
+          substitute_opponent_player_id: game.substitute_opponent_player ? game.substitute_opponent_player.id : null,
+          substitute_home_player_id: game.substitute_home_player ? game.substitute_home_player.id : null
+        })
+        .then(response => { that.playedmessage.text = "Remplacements effectués sur les matchs "; that.playedmessage.snackbar = true; })
+        .catch(e => { console.error(e) })
       })
     }
   }

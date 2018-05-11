@@ -2,47 +2,28 @@
   <v-layout>
     <v-flex xs12>
       <Mynavigation></Mynavigation>
-      <v-list two-line class="mt-5">
-        <v-tabs v-model="active" color="gray lighten-2" dark slider-color="black">
-          <v-tab key="classement-teams" ripple >
-            Equipes
-          </v-tab>
-          <v-tab-item key="classement-teams">
-            {{classementTeams}}
-            <v-data-table :headers="headersMatchs" :items="classementTeams" hide-actions class="elevation-1">
-              <template slot="items" slot-scope="props">
-                <td>{{ props.item.name }}</td>
-                <td>{{ props.item.pts }}</td>
-                <td>{{ props.item.played }}</td>
-                <td>{{ props.item.won }}</td>
-                <td>{{ props.item.draw }}</td>
-                <td>{{ props.item.lost }}</td>
-                <td>{{ props.item.Hpts }}</td>
-                <td>{{ props.item.Hplayed }}</td>
-                <td>{{ props.item.Hwon }}</td>
-                <td>{{ props.item.Hdraw }}</td>
-                <td>{{ props.item.Hlost }}</td>
-                <td>{{ props.item.Opts }}</td>
-                <td>{{ props.item.Oplayed }}</td>
-                <td>{{ props.item.Owon }}</td>
-                <td>{{ props.item.Odraw }}</td>
-                <td>{{ props.item.Olost }}</td>
-              </template>
-            </v-data-table>
-          </v-tab-item>
-          <v-tab key="classement-singles" ripple >
-            Simples
-          </v-tab>
-          <v-tab-item key="classement-singles">
-            Classement simples
-          </v-tab-item>
-          <v-tab key="classement-doubles" ripple >
-            Doubles
-          </v-tab>
-          <v-tab-item key="classement-doubles">
-            Classement doubles
-          </v-tab-item>
-        </v-tabs>
+      <v-list two-line class="mt-5"> 
+        <v-data-table :headers="headersMatchs" :items="classementTeams" item-key="name" hide-actions class="elevation-1">
+          <template slot="items" slot-scope="props" >
+            <td>{{ props.index+1 }}</td>
+            <td>{{ props.item.name }}</td>
+            <td>{{ props.item.pts }}</td>
+            <td>{{ props.item.played }}</td>
+            <td>{{ props.item.won }}</td>
+            <td>{{ props.item.draw }}</td>
+            <td>{{ props.item.lost }}</td>
+            <td>{{ props.item.Hpts }}</td>
+            <td>{{ props.item.Hplayed }}</td>
+            <td>{{ props.item.Hwon }}</td>
+            <td>{{ props.item.Hdraw }}</td>
+            <td>{{ props.item.Hlost }}</td>
+            <td>{{ props.item.Opts }}</td>
+            <td>{{ props.item.Oplayed }}</td>
+            <td>{{ props.item.Owon }}</td>
+            <td>{{ props.item.Odraw }}</td>
+            <td>{{ props.item.Olost }}</td>
+          </template>
+        </v-data-table>      
       </v-list>
     </v-flex>
   </v-layout>
@@ -61,6 +42,8 @@ export default {
       classementTeams: [],
       active: null,
       headersMatchs: [
+        { text: '', value: 'index', sortable: false},
+        { text: '', value: 'index'},
         { text: 'Equipe', value: 'team'},
         { text: 'Pts', value: 'pts'},
         { text: 'J', value: 'j'},

@@ -11,6 +11,7 @@
               </v-card-text>
               <v-card-text v-if="match.score_home != 0 && match.score_opponent != 0">
                 {{match.team_home.name}} {{match.score_home}} vs {{match.team_opponent.name}} {{match.score_opponent}}
+                <nuxt-link dense small :to="{name:'matchs-id', params: {id:match.id}}">voir les scores </nuxt-link> 
               </v-card-text>
               <v-card-text>
                 Jounée {{match.day}}
