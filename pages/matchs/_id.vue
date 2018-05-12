@@ -226,6 +226,7 @@ import Mysnackbar from '../../components/Snackbar'
 import Players from '../../components/Players'
 
 export default {
+  middleware: ['auth'],
   components: {
     Mynavigation,
     Mysnackbar,
@@ -275,7 +276,7 @@ export default {
       data.team_opponent.substitute = data.team_opponent.player.slice(4,5);
       return data
     };
-    let { data } = await app.$axios.get(`/matches/${params.id}`)
+    let { data } = await app.$axios.get(`/api/matches/${params.id}`)
     data = addFullName(data);
     //data = getRemplacantsA(data);
     //data = getRemplacantsE(data);
@@ -441,7 +442,7 @@ export default {
       else {
         this.playedmessage.text = `Score du ${game.name} enregistré ` // snackbar
       }
-      this.$axios.put('/gamesingles/'+game.id, {
+      this.$axios.put('/api/gamesingles/'+game.id, {
         leg1ph: game.leg1ph,
         leg2ph: game.leg2ph,
         leg3ph: game.leg3ph,
@@ -473,7 +474,7 @@ export default {
       else {
         this.playedmessage.text = `Score du ${double.name} enregistré `
       }
-      this.$axios.put('/gamedoubles/'+double.id, {
+      this.$axios.put('/api/gamedoubles/'+double.id, {
         leg1dh: double.leg1dh,
         leg2dh: double.leg2dh,
         leg3dh: double.leg3dh,
@@ -492,7 +493,7 @@ export default {
     async saveMatch(match) {
       if(this.countMatchPlayed(match) == 20 && this.signatures.length == 2) {
         let that = this
-        this.$axios.put(`/matches/${match.id}`, {
+        this.$axios.put(`/api/matches/${match.id}`, {
           score_home: that.totalA(match),
           score_opponent: that.totalE(match),
           signatures: that.signatures.join(',')

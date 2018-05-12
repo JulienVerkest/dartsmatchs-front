@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     async updatePlayers() {
-      this.teams = await this.$axios.$get('/teams?division=1')
+      this.teams = await this.$axios.$get('/api/teams?division=1')
     }
   },
   mounted () {

@@ -33,6 +33,7 @@
 import _ from 'lodash'
 import Mynavigation from '../../../components/Navigation'
 export default {
+  middleware: ['auth'],
   components: {
     Mynavigation
   },
@@ -86,7 +87,7 @@ export default {
 
     async getMatchs() {
       let that = this
-      this.matchs = await this.$axios.$get('/matches')
+      this.matchs = await this.$axios.$get('/api/matches')
       _.each(this.matchs, function(m){
         that.classementTeams.push(m.team_home)
       })

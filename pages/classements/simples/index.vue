@@ -25,6 +25,7 @@
 import _ from 'lodash'
 import Mynavigation from '../../../components/Navigation'
 export default {
+  middleware: ['auth'],
   components: {
     Mynavigation
   },
@@ -49,7 +50,7 @@ export default {
   methods: {
     async getMatchs() {
       let that = this
-      this.matchs = await this.$axios.$get('/gamesingles?played=true')
+      this.matchs = await this.$axios.$get('/api/gamesingles?played=true')
       _.each(this.matchs, function(m){
         if(m.substitute_home_player) {
           that.classementSimples.push(m.substitute_home_player)

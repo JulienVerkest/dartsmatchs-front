@@ -16,6 +16,7 @@
 <script>
 import Mynavigation from '../../components/Navigation'
 export default {
+  middleware: ['auth'],
   components: {
     Mynavigation
   },
@@ -25,7 +26,7 @@ export default {
   },
   async asyncData({ app, params }) {
     // We can use async/await ES6 feature
-    let { data } = await app.$axios.get(`/teams/${params.id}`)
+    let { data } = await app.$axios.get(`/api/teams/${params.id}`)
     return { team: data }
   },
   head() {

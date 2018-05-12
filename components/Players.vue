@@ -288,7 +288,7 @@ export default {
                 game.player_start_id = match.team_home.player[index].id;
                 game.player_start = match.team_home.player[index];
               }
-              let upd = that.$axios.put('/gamesingles/'+game.id, {
+              let upd = that.$axios.put('/api/gamesingles/'+game.id, {
                 player_home_id: game.player_home.id,
                 player_start_id: game.player_start.id
               })
@@ -307,7 +307,7 @@ export default {
                 game.player_start_id = match.team_opponent.player[index].id;
                 game.player_start = match.team_opponent.player[index];
               }
-              let upd = that.$axios.put('/gamesingles/'+game.id, {
+              let upd = that.$axios.put('/api/gamesingles/'+game.id, {
                 player_opponent_id: game.player_opponent.id,
                 player_start_id: game.player_start.id
               })
@@ -338,7 +338,7 @@ export default {
                 game.double_start_id = match.team_home.double[index].id;
                 game.double_start = match.team_home.double[index];
               }
-              let upd = that.$axios.put('/gamedoubles/'+game.id, {
+              let upd = that.$axios.put('/api/gamedoubles/'+game.id, {
                 double_home_id: game.double_home.id,
                 double_start_id: game.double_start.id
               })
@@ -356,7 +356,7 @@ export default {
                 game.double_start_id = match.team_opponent.double[index].id;
                 game.double_start = match.team_opponent.double[index];
               }
-              let upd = that.$axios.put('/gamedoubles/'+game.id, {
+              let upd = that.$axios.put('/api/gamedoubles/'+game.id, {
                 double_opponent_id: game.double_opponent.id,
                 double_start_id: game.double_start.id
               })
@@ -405,7 +405,7 @@ export default {
 
 
       let that = this
-      this.$axios.put(`/matches/${match.id}`, {
+      this.$axios.put(`/api/matches/${match.id}`, {
         substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
         substitute_home_replace: match.substitute_home_replace,
         substitute_home_after: match.substitute_home_after,
@@ -450,7 +450,7 @@ export default {
         else {
           game.substitute_opponent_player = null
         }
-        that.$axios.put('/gamesingles/'+game.id, {
+        that.$axios.put('/api/gamesingles/'+game.id, {
           substitute_opponent_player_id: game.substitute_opponent_player ? game.substitute_opponent_player.id : null,
           substitute_home_player_id: game.substitute_home_player ? game.substitute_home_player.id : null
         })

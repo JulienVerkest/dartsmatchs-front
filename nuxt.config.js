@@ -38,8 +38,15 @@ module.exports = {
   modules: [
     '@nuxtjs/vuetify',
     '@nuxtjs/axios',
-    //'@nuxtjs/auth'
+    '@nuxtjs/auth'
   ],
+  auth: {
+    endpoints: {
+      login:  { url: '/api/users/sign_in' },
+      logout: { url: '/api/users/sign_out', method: 'delete' },
+      user:   { url: '/api/users/current' }
+    }
+  },
   axios: {
     host: 'localhost',
     port: 3000,

@@ -27,6 +27,7 @@
 <script>
 import Mynavigation from '../../components/Navigation'
 export default {
+  middleware: ['auth'],
   components: {
     Mynavigation
   },
@@ -37,7 +38,7 @@ export default {
   },
   methods: {
     async updateMatchs() {
-      this.matches = await this.$axios.$get('/matches?division=1')
+      this.matches = await this.$axios.$get('/api/matches?division=1')
     }
   },
   mounted () {
