@@ -39,6 +39,7 @@
     <!-- MATCHS -->
               <v-layout row wrap>
                 <v-flex xs12 md9>
+                  <v-btn  @click.native="scoreZero(match)">Tout remettre à zéro</v-btn>
                   <v-layout row wrap>
                     <!-- SINGLES -->
                     <v-flex xs6 md3 v-for="(game,index) in match.gamesingle" :key="game.id+ '-gs'"> 
@@ -246,7 +247,7 @@ export default {
         timeout: 2000,
         text: 'Score du match enregistré'
       },
-      e1: 0,
+      e1: 1,
       customFilter (item, queryText, itemText) {
         const hasValue = val => val != null ? val : '';
         const text = hasValue(item.first_name + item.last_name);
@@ -268,18 +269,8 @@ export default {
         });
       return data
     };
-    function getRemplacantsA(data) {
-      data.team_home.substitute = data.team_home.player.slice(4,5);
-      return data
-    };
-    function getRemplacantsE(data) {
-      data.team_opponent.substitute = data.team_opponent.player.slice(4,5);
-      return data
-    };
     let { data } = await app.$axios.get(`/api/matches/${params.id}`)
     data = addFullName(data);
-    //data = getRemplacantsA(data);
-    //data = getRemplacantsE(data);
     return { 
       match: data
     }
@@ -428,6 +419,22 @@ export default {
         r = true
       }
       return r
+    },
+    scoreZero: function(match) {
+      console.log('ZERO')
+      let that = this
+      _.each(match.gamesingle, function(gs) {
+        gs.played = false
+        that.saveGameSingle(gs)
+        
+
+      });
+      _.each(match.gamedouble, function(gd) {
+        gd.played = false
+        that.saveGameDouble(gd)
+      });
+      that.totalE(match)
+      that.totalA(match)
     },
     async saveGameSingle(game) {
       if(game.played === false) {

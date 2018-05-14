@@ -52,18 +52,20 @@ export default {
       let that = this
       this.matchs = await this.$axios.$get('/api/gamesingles?played=true')
       _.each(this.matchs, function(m){
-        if(m.substitute_home_player) {
-          that.classementSimples.push(m.substitute_home_player)
-        }
-        else {
-          that.classementSimples.push(m.player_home)
-        } 
+        if(m.match.signatures!==''){
+          if(m.substitute_home_player) {
+            that.classementSimples.push(m.substitute_home_player)
+          }
+          else {
+            that.classementSimples.push(m.player_home)
+          } 
 
-        if(m.substitute_opponent_player) {
-          that.classementSimples.push(m.substitute_opponent_player)
-        }
-        else {
-          that.classementSimples.push(m.player_opponent)
+          if(m.substitute_opponent_player) {
+            that.classementSimples.push(m.substitute_opponent_player)
+          }
+          else {
+            that.classementSimples.push(m.player_opponent)
+          }
         }
       })
       this.classementSimples = _.uniqBy(this.classementSimples, 'id')
@@ -89,6 +91,7 @@ export default {
       });
       this.classementSimples = _.each(this.classementSimples, function(player){
         _.each(that.matchs, function(m){
+          if(m.match.signatures!==''){
             if(m.substitute_home_player_id == player.id){
               if(m.leg1po+m.leg2po+m.leg3po == 2 ) { player.won++;player.pts+=3 } 
               else if(m.leg1po+m.leg2po+m.leg3po < 2 ) { player.lost++;player.pts+=1  } 
@@ -121,6 +124,7 @@ export default {
               player.leglost+=m.leg1ph+m.leg2ph+m.leg3ph 
               player.played++
             }
+          }
         });
       });
       this.classementSimples = _.reverse(_.sortBy(this.classementSimples, 'pts'))

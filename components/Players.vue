@@ -402,8 +402,6 @@ export default {
       return player
     },
     async substitute(match) {
-
-
       let that = this
       this.$axios.put(`/api/matches/${match.id}`, {
         substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
@@ -424,6 +422,7 @@ export default {
     },
     async updateAfterSubstittuteGameSingle(match) {
       let that = this
+      // Simples
       _.each(match.gamesingle, function(game, index){
         if(match.substitute_home_replace) {
           let player_home_replace = that.getPlayerHomeByLetter(match, match.substitute_home_replace) 
@@ -456,7 +455,46 @@ export default {
         })
         .then(response => { that.playedmessage.text = "Remplacements effectués sur les matchs "; that.playedmessage.snackbar = true; })
         .catch(e => { console.error(e) })
-      })
+      });
+    },
+
+    // to do
+    async updateAfterSubstittuteGameDouble(match) {
+      let that = this
+      // Double
+      _.each(match.gamedouble, function(game, index){
+        if(match.substitute_home_replace) {
+          let player_home_replace = that.getPlayerHomeByLetter(match, match.substitute_home_replace) 
+          if(player_home_replace.id==game.player_home.id && match.substitute_home_after<=index+1) {
+            game.substitute_home_player = match.substitute_home_player
+          }
+          else {
+            game.substitute_home_player = null
+          }
+        }
+        else {
+          game.substitute_home_player = null
+        }
+        
+        if(match.substitute_opponent_replace) {
+          let player_opponent_replace = that.getPlayerOpponentByLetter(match, match.substitute_opponent_replace) 
+          if(player_opponent_replace.id==game.player_opponent.id && match.substitute_opponent_after<=index+1) {
+            game.substitute_opponent_player = match.substitute_opponent_player
+          }
+          else {
+            game.substitute_opponent_player = null
+          }
+        }
+        else {
+          game.substitute_opponent_player = null
+        }
+        that.$axios.put('/api/gamedoubles/'+game.id, {
+          substitute_opponent_player_id: game.substitute_opponent_player ? game.substitute_opponent_player.id : null,
+          substitute_home_player_id: game.substitute_home_player ? game.substitute_home_player.id : null
+        })
+        .then(response => { that.playedmessage.text = "Remplacements effectués sur les matchs "; that.playedmessage.snackbar = true; })
+        .catch(e => { console.error(e) })
+      });
     }
   }
 }
