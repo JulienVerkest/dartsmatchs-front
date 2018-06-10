@@ -73,9 +73,9 @@
        <v-list class="mt-2" >
          <v-layout row wrap v-if="!editTeamARemplacant">
             <v-subheader v-if="match.substitute_home_player">
-              {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}} remplace le joueur 
-              {{match.substitute_home_replace}} après le match n°
-              {{match.substitute_home_after}}
+              {{match.substitute_home_player.first_name}} {{match.substitute_home_player.last_name}} remplace  
+              {{match.substitute_home_replace}}) <span class="mx-1" v-html="displayPlayer(getPlayerHomeByLetter(match, match.substitute_home_replace))"></span>  <span> après le match n°
+              {{match.substitute_home_after}} </span>
                 <v-btn round icon color="grey lighten-4" small @click.native="match.substitute_home_player=null;match.substitute_home_replace='';match.substitute_home_after='';substitute(match)"><v-tooltip right><v-icon slot="activator" small class="mr-2" >undo</v-icon><span>Annuler le remplacement</span> </v-tooltip></v-btn>
             </v-subheader>
             <div>
@@ -85,7 +85,7 @@
          <v-layout row wrap v-if="editTeamARemplacant">
            <v-flex md4 xs12>
              <v-select
-              :items="match.team_home.player"
+              :items="getSubstitute(match,'A')"
               item-value=""
               item-text="fullname" 
               label="Remplaçant "
@@ -193,20 +193,19 @@
       <v-list class="mt-2" >
          <v-layout row wrap v-if="!editTeamERemplacant">
             <v-subheader v-if="match.substitute_opponent_player">
-              {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace le joueur 
-              {{match.substitute_opponent_replace}}  après le match n°
+              {{match.substitute_opponent_player.first_name}} {{match.substitute_opponent_player.last_name}} remplace {{match.substitute_opponent_replace}}) <span class="mx-1" v-html="displayPlayer(getPlayerOpponentByLetter(match, match.substitute_opponent_replace))"></span> après le match n°
               {{match.substitute_opponent_after}}
               <v-btn round icon color="grey lighten-4" small @click.native="match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';substitute(match)"><v-tooltip right><v-icon slot="activator" small class="mr-2" >undo</v-icon><span>Annuler le remplacement</span> </v-tooltip></v-btn>
             </v-subheader>
             <div>
-              <v-btn round color="grey lighten-4" small @click.native="editTeamERemplacant=true;match.signatures==''"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
+              <v-btn round color="grey lighten-4" small @click.native="editTeamERemplacant=true;match.signatures=='';"><v-icon small class="mr-2" >compare_arrows</v-icon> Effectuer un remplacement </v-btn>
             </div>
          </v-layout>
          <v-layout row wrap v-if="editTeamERemplacant">
           
            <v-flex md4 xs12>
              <v-select
-              :items="match.team_opponent.player"
+              :items="getSubstitute(match,'E')"
               item-value=""
               item-text="fullname" 
               label="Remplaçant "
@@ -235,7 +234,7 @@
               ></v-select>
             </v-flex>
             <v-btn round small flat @click="editTeamERemplacant=false;match.substitute_opponent_player=null;match.substitute_opponent_replace='';match.substitute_opponent_after='';">Annuler</v-btn>
-            <v-btn round color="grey lighten-3" small @click.native="editTeamERemplacant=false;substitute(match)"><v-icon small class="mr-2">save</v-icon> Enregistrer</v-btn>
+            <v-btn round color="grey lighten-3" small @click.native="editTeamERemplacant=false;substitute(match)" :disabled="!match.substitute_opponent_player || match.substitute_opponent_replace == '' || match.substitute_opponent_after==''"><v-icon small class="mr-2" >save</v-icon> Enregistrer</v-btn>
          </v-layout>
       </v-list>
     </v-flex>
@@ -254,6 +253,14 @@ export default {
   },
   name: 'Players',
   props: ['match'],
+  filters: {
+    capitalize: function (value) {
+      console.log(value)
+      if (!value) return ''
+      value = value.toString()
+      return value.charAt(0).toUpperCase() + value.slice(1)
+    }
+  },
   data () {
     return {
       signatures: [],
@@ -375,7 +382,13 @@ export default {
     countMatchPlayed: function(match) {
       return _.filter(match.gamesingle, { played: true}).length + _.filter(match.gamedouble, { played: true}).length
     },
-    // retourne le joueur remplacé
+
+    // retourne le nom prénom du joueur
+    displayPlayer: function(player) {
+      return player.first_name + ' ' + player.last_name 
+    },
+
+    // retourne en objet le joueur remplacé team A
     getPlayerHomeByLetter: function(match, letter) {
       let lettersA = ['A','B','C','D']
       let player = ''
@@ -388,7 +401,7 @@ export default {
       }
       return player
     },
-    // retourne le joueur remplacé
+    // retourne en objet le joueur remplacé team E
     getPlayerOpponentByLetter: function(match, letter) {
       let lettersE = ['E','F','G','H']
       let player = ''
@@ -401,24 +414,76 @@ export default {
       }
       return player
     },
+    // retourne les joueurs remplaçants de l'équipe
+    getSubstitute: function(match, team){ 
+      let substitutes = []
+      if(team === 'E') {
+        _.each(match.team_opponent.player, function(p) {
+          let jepasse = true
+          _.each(_.map(match.gamesingle.slice(4,8),'player_opponent'), function(titulaire) {
+            if(titulaire.id == p.id) {
+              jepasse = false
+            }
+          })
+          if(jepasse) {
+            substitutes.push(p)
+          }
+        })
+      } else {
+        _.each(match.team_home.player, function(p) {
+          let jepasse = true
+          _.each(_.map(match.gamesingle.slice(0,4),'player_home'), function(titulaire) {
+            if(titulaire.id == p.id) {
+              jepasse = false
+            }
+          })
+          if(jepasse) {
+            substitutes.push(p)
+          }
+        })
+      }
+      return substitutes
+    },
     async substitute(match) {
       let that = this
-      this.$axios.put(`/api/matches/${match.id}`, {
-        substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
-        substitute_home_replace: match.substitute_home_replace,
-        substitute_home_after: match.substitute_home_after,
-        substitute_opponent_player_id: match.substitute_opponent_player ? match.substitute_opponent_player.id : null,
-        substitute_opponent_replace: match.substitute_opponent_replace,
-        substitute_opponent_after: match.substitute_opponent_after
-      })
-      .then(response => {
-        this.playedmessage.text = "Remplacement effectué"
-        this.playedmessage.snackbar = true
-        this.updateAfterSubstittuteGameSingle(match)
-      })
-      .catch(e => {
-        this.errors.push(e)
-      })
+      let jepasse = true
+      // check team A home
+      _.each(match.gamesingle.slice(0,4), function(gs){
+        if(match.substitute_home_player && gs.player_home.id == match.substitute_home_player.id) {
+          jepasse = false
+          alert(match.substitute_home_player.first_name + " "+ match.substitute_home_player.last_name + " est déjà dans l'équipe")
+        }
+      });
+
+      // check team E opponent
+      if(jepasse) {
+        _.each(match.gamesingle.slice(4,8), function(gs){
+          if(match.substitute_opponent_player && gs.player_opponent.id == match.substitute_opponent_player.id) {
+            jepasse = false
+            alert(match.substitute_opponent_player.first_name + " "+ match.substitute_opponent_player.last_name + " est déjà dans l'équipe")
+          }
+        });
+      }
+
+      if(jepasse) {
+        this.$axios.put(`/api/matches/${match.id}`, {
+          substitute_home_player_id: match.substitute_home_player ? match.substitute_home_player.id : null,
+          substitute_home_replace: match.substitute_home_replace,
+          substitute_home_after: match.substitute_home_after,
+          substitute_opponent_player_id: match.substitute_opponent_player ? match.substitute_opponent_player.id : null,
+          substitute_opponent_replace: match.substitute_opponent_replace,
+          substitute_opponent_after: match.substitute_opponent_after
+        })
+        .then(response => {
+          this.playedmessage.text = "Remplacement effectué"
+          this.playedmessage.snackbar = true
+          this.updateAfterSubstittuteGameSingle(match)
+        })
+        .catch(e => {
+          this.errors.push(e)
+        })
+      }
+
     },
     async updateAfterSubstittuteGameSingle(match) {
       let that = this
