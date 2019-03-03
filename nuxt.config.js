@@ -41,10 +41,14 @@ module.exports = {
     '@nuxtjs/auth'
   ],
   auth: {
-    endpoints: {
-      login:  { url: '/api/users/sign_in' },
-      logout: { url: '/api/users/sign_out', method: 'delete' },
-      user:   { url: '/api/users/current' }
+    strategies: {
+      local: {
+        endpoints: {
+          login:  { url: '/api/users/sign_in', method: 'post' },
+          logout: { url: '/api/users/sign_out', method: 'delete' },
+          user:   { url: '/api/users/current' }
+        }
+      } 
     }
   },
   axios: {

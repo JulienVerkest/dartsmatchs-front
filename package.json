@@ -19,17 +19,19 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
-    "@nuxtjs/auth": "^4.3.0",
-    "@nuxtjs/axios": "^5.3.1",
-    "@nuxtjs/vuetify": "^0.4.2",
-    "nuxt": "^1.0.0",
-    "vuedraggable": "^2.16.0"
+    "@nuxtjs/auth": "^4.5.3",
+    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/vuetify": "^0.4.3",
+    "nuxt": "^1.4.5",
+    "vue": "^2.5.22",
+    "vuedraggable": "^2.17.0",
+    "vuetify": "^1.4.3"
   },
   "devDependencies": {
-    "babel-eslint": "^8.2.1",
+    "babel-eslint": "^8.2.6",
     "eslint": "^4.15.0",
     "eslint-friendly-formatter": "^3.0.0",
     "eslint-loader": "^1.7.1",
-    "eslint-plugin-vue": "^4.0.0"
+    "eslint-plugin-vue": "^4.7.1"
   }
 }

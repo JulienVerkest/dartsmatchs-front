@@ -4,14 +4,19 @@
       <Mynavigation></Mynavigation>
       <v-divider outset></v-divider>
       <v-container class="mt-5" grid-list-md>
+        <v-layout row justify-center class="mb-4" >
+            <v-flex xs12>
+              <div id="match-day">journée {{match.day}}</div>
+            </v-flex>
+        </v-layout>
         <v-layout row justify-center class="mb-4">
-          <v-flex xs2>
+          <v-flex xs2 text-center>
             <v-badge right color="black">
               <span slot="badge">{{totalA(match)}}</span> 
               {{match.team_home.name}}
             </v-badge>
           </v-flex>
-          <v-flex xs2>
+          <v-flex xs2 text-center>
             <v-badge left color="black">
               <span slot="badge">{{totalE(match)}}</span> 
               {{match.team_opponent.name}}
@@ -69,9 +74,9 @@
                               <v-checkbox :disabled="game.leg3po == 1 || game.played"  v-model="game.leg3ph" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
                               <v-checkbox  :disabled="game.leg3ph == 1 || game.played"  v-model="game.leg3po" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
                             </v-flex>
-                            <v-flex xs3 class="ma-0 pa-0">
-                              <div class="headline"> {{ calculScorej1(game) }} </div> 
-                              <div class="headline mt-4"> {{ calculScorej2(game) }} </div>
+                            <v-flex xs3 class="ma-0 pa-0 mt-3">
+                              <div class="headline "> {{ calculScorej1(game) }} </div> 
+                              <div class="headline pt-2 mt-4"> {{ calculScorej2(game) }} </div>
                             </v-flex>
                           </v-layout>
                           <div class="ma-0 pa-0">
@@ -116,9 +121,9 @@
                               <v-checkbox :disabled="double.leg3do == 1 || double.played"  v-model="double.leg3dh" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
                               <v-checkbox  :disabled="double.leg3dh == 1 || double.played"  v-model="double.leg3do" v-bind:true-value="1" v-bind:false-value="0"></v-checkbox>
                             </v-flex>
-                            <v-flex xs3 class="ma-0 pa-0">
-                              <div class="headline mt-1"> {{ calculScoreDoublej1(double) }} </div> 
-                              <div class="headline mt-4"> {{ calculScoreDoublej2(double) }} </div>
+                            <v-flex xs3 class="ma-0 pa-0 mt-3">
+                              <div class="headline mt-1  "> {{ calculScoreDoublej1(double) }} </div> 
+                              <div class="headline pt-2 mt-4"> {{ calculScoreDoublej2(double) }} </div>
                             </v-flex>
                           </v-layout>
                           <div class="ma-0 pa-0">
@@ -532,4 +537,5 @@ export default {
 .list-complete-enter, .list-complete-leave-active {
   opacity: 0;
 }
+ 
 </style>

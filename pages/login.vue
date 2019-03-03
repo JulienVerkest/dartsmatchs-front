@@ -44,7 +44,10 @@ export default {
   },
   methods: {
     login: function () {
-      this.$auth.login({
+      console.log(this.$auth)
+      // console.log(this.$auth.strategies.endpoints)
+      // this.$axios.post('/api/users/sign_in', {
+      this.$auth.loginWith('local', {
         data: {
           user: {
             email: this.email,
